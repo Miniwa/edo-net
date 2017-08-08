@@ -69,8 +69,7 @@ namespace Edo
         public unsafe void TestRead()
         {
             int number = 30;
-            int* ptr = &number;
-            IntPtr address = (IntPtr)ptr;
+            IntPtr address = (IntPtr)(&number);
 
             OutStream.SetLength(4);
             Marshal.Read(address, OutStream.GetBuffer(), 4);
@@ -81,8 +80,7 @@ namespace Edo
         public unsafe void TestReadWithStream()
         {
             int number = 30;
-            int* ptr = &number;
-            IntPtr address = (IntPtr)ptr;
+            IntPtr address = (IntPtr)(&number);
 
             Marshal.Read(address, OutStream, 4);
             OutStream.Seek(0, SeekOrigin.Begin);
