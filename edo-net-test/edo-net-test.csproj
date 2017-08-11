@@ -56,7 +56,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="IntPtrExtensionTest.cs" />
-    <Compile Include="VmMarshalTest.cs" />
+    <Compile Include="VirtualMemoryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

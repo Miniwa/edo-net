@@ -7,7 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Edo.Windows;
+using Edo.Native;
 using Microsoft.Win32.SafeHandles;
 
 
@@ -16,9 +16,9 @@ namespace Edo
     /// <summary>
     /// Provides a managed low level interface to a target virtual memory
     /// </summary>
-    public class VmMarshal
+    public class VirtualMemory
     {
-        public VmMarshal()
+        public VirtualMemory()
         {
             ProcessHandle = null;
             Buffer = new byte[16];
@@ -28,7 +28,7 @@ namespace Edo
         /// Opens and targets the virtual memory of process with given id
         /// </summary>
         /// <param name="id">The id of the process to be opened</param>
-        /// <exception cref="InvalidOperationException">If marshal already has a target open</exception>
+        /// <exception cref="InvalidOperationException">If a target is already open</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         public void Open(Int32 id)
         {
@@ -46,7 +46,7 @@ namespace Edo
         /// Opens and targets the virtual memory of given process
         /// </summary>
         /// <param name="process">The process to be opened</param>
-        /// <exception cref="InvalidOperationException">If marshal already has a target open</exception>
+        /// <exception cref="InvalidOperationException">If a target is already open</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         public void Open(Process process)
         {
@@ -66,7 +66,7 @@ namespace Edo
         }
 
         /// <summary>
-        /// Whether the marshal has opened a virtual memory or not
+        /// Whether a virtual memory has been opened or not
         /// </summary>
         public Boolean IsOpen
         {

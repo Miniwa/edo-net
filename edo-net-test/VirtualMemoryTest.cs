@@ -7,9 +7,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Edo
 {
     [TestClass]
-    public class VmMarshalTest
+    public class VirtualMemoryTest
     {
-        public VmMarshalTest()
+        public VirtualMemoryTest()
         {
             Marshal = null;
             ClosedMarshal = null;
@@ -20,9 +20,9 @@ namespace Edo
         [TestInitialize]
         public void Init()
         {
-            Marshal = new VmMarshal();
+            Marshal = new VirtualMemory();
             Marshal.Open(Process.GetCurrentProcess());
-            ClosedMarshal = new VmMarshal();
+            ClosedMarshal = new VirtualMemory();
             OutStream.Seek(0, SeekOrigin.Begin);
             OutStream.SetLength(0);
         }
@@ -108,8 +108,8 @@ namespace Edo
             Marshal.Read(IntPtr.Zero, OutStream.GetBuffer(), 4);
         }
 
-        public VmMarshal Marshal { get; set; }
-        public VmMarshal ClosedMarshal { get; set; }
+        public VirtualMemory Marshal { get; set; }
+        public VirtualMemory ClosedMarshal { get; set; }
         public MemoryStream OutStream { get; set; }
         public BinaryReader Reader { get; set; }
     }
