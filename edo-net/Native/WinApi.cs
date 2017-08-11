@@ -15,6 +15,10 @@ namespace Edo.Native
         public static extern Boolean ReadProcessMemory(IntPtr processHandle, IntPtr address, byte[] buffer,
             Int32 nrBytesToRead, ref Int32 nrBytesRead);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern Boolean WriteProcessMemory(IntPtr processHandle, IntPtr address, byte[] buffer,
+            Int32 nrBytesToWrite, ref Int32 nrBytesWritten);
+
         // Process right constants
         public const int PROCESS_VM_OPERATION = 0x0008;
         public const int PROCESS_VM_READ = 0x0010;

@@ -50,6 +50,9 @@ namespace Edo
         /// <exception cref="Win32Exception">On Windows API error</exception>
         public void Open(Process process)
         {
+            if(process == null)
+                throw new ArgumentNullException(nameof(process));
+
             Open(process.Id);
         }
 
@@ -85,6 +88,9 @@ namespace Edo
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
         public void Read(IntPtr address, byte[] buffer, Int32 count)
         {
+            if(buffer == null)
+                throw new ArgumentNullException(nameof(buffer));
+
             if (count > buffer.Length)
                 throw new ArgumentException("Not enough room in buffer to hold requested amount of data");
 
@@ -111,6 +117,9 @@ namespace Edo
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
         public void Read(IntPtr address, Stream outStream, Int32 count)
         {
+            if(outStream == null)
+                throw new ArgumentNullException(nameof(outStream));
+
             if (count > Buffer.Length)
                 Buffer = new byte[count];
 
@@ -124,6 +133,9 @@ namespace Edo
         /// <typeparam name="T">The type of structure or formatted class to be read</typeparam>
         /// <param name="address">The address to be read from</param>
         /// <returns>The structure or instance read from virtual memory</returns>
+        /// <exception cref="InvalidOperationException">If no virtual memory has been targeted</exception>
+        /// <exception cref="Win32Exception">On Windows API error</exception>
+        /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
         public T Read<T>(IntPtr address)
         {
             int size = Marshal.SizeOf<T>();
@@ -138,6 +150,86 @@ namespace Edo
                 Marshal.Copy(Buffer, 0, ptr, size);
 
                 return Marshal.PtrToStructure<T>(ptr);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(ptr);
+            }
+        }
+
+        /// <summary>
+        /// Writes given count of bytes from given buffer to given address in target virtual memory
+        /// </summary>
+        /// <param name="address">The address to be written to</param>
+        /// <param name="buffer">The buffer containing the data to be written</param>
+        /// <param name="count">The amount of bytes to write from the buffer</param>
+        /// <exception cref="ArgumentException">If buffer is too small to fit the requested data</exception>
+        /// <exception cref="InvalidOperationException">If no virtual memory has been targeted</exception>
+        /// <exception cref="Win32Exception">On Windows API error</exception>
+        /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were written</exception>
+        public void Write(IntPtr address, byte[] buffer, Int32 count)
+        {
+            if(buffer == null)
+                throw new ArgumentNullException(nameof(buffer));
+
+            if (count > buffer.Length)
+                throw new ArgumentException("Not enough room in buffer to hold requested amount of data");
+
+            if (!IsOpen)
+                throw new InvalidOperationException("A virtual memory must be targeted before write operations are available");
+
+            int nrBytesWritten = 0;
+            if(!WinApi.WriteProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer, count, ref nrBytesWritten))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform write operation");
+
+            if(nrBytesWritten != count)
+                throw new InvalidOperationException(string.Format("Operation only wrote {0} out of {1} wanted bytes", nrBytesWritten, count));
+        }
+
+        /// <summary>
+        /// Writes given count of bytes from given stream to given address in target virtual memory
+        /// </summary>
+        /// <param name="address">The address to be written to</param>
+        /// <param name="stream">The stream containing the data to be written</param>
+        /// <param name="count">The amount of bytes to write from the stream</param>
+        /// <exception cref="InvalidOperationException">If no virtual memory has been targeted</exception>
+        /// <exception cref="Win32Exception">On Windows API error</exception>
+        /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were written</exception>
+        public void Write(IntPtr address, Stream stream, Int32 count)
+        {
+            if(stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
+            if (count > Buffer.Length)
+                Buffer = new byte[count];
+
+            stream.Read(Buffer, 0, count);
+            Write(address, Buffer, count);
+        }
+
+        /// <summary>
+        /// Writes a structure or an instance of a formatted class to given address in target virtual memory
+        /// </summary>
+        /// <typeparam name="T">The type of the structure or formatted class to be written</typeparam>
+        /// <param name="address">The address to be written to</param>
+        /// <param name="value">The structure or instance of a formatted class to be written</param>
+        public void Write<T>(IntPtr address, T value)
+        {
+            if(value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            int size = Marshal.SizeOf(value);
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+
+            try
+            {
+                if (Buffer.Length < size)
+                    Buffer = new byte[size];
+
+                Marshal.StructureToPtr(value, ptr, false);
+                Marshal.Copy(ptr, Buffer, 0, size);
+
+                Write(address, Buffer, size);
             }
             finally
             {
