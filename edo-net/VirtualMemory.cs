@@ -83,7 +83,6 @@ namespace Edo
         /// <exception cref="InvalidOperationException">If no virtual memory has been targeted</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
-        /// <returns></returns>
         public void Read(IntPtr address, byte[] buffer, Int32 count)
         {
             if (count > buffer.Length)
@@ -110,7 +109,6 @@ namespace Edo
         /// <exception cref="InvalidOperationException">If no virtual memory has been targeted</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
-        /// <returns></returns>
         public void Read(IntPtr address, Stream outStream, Int32 count)
         {
             if (count > Buffer.Length)
@@ -118,6 +116,33 @@ namespace Edo
 
             Read(address, Buffer, count);
             outStream.Write(Buffer, 0, count);
+        }
+
+        /// <summary>
+        /// Reads a structure or an instance of a formatted class from given address in target virtual memory
+        /// </summary>
+        /// <typeparam name="T">The type of structure or formatted class to be read</typeparam>
+        /// <param name="address">The address to be read from</param>
+        /// <returns>The structure or instance read from virtual memory</returns>
+        public T Read<T>(IntPtr address)
+        {
+            int size = Marshal.SizeOf<T>();
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+
+            try
+            {
+                if(Buffer.Length < size)
+                    Buffer = new byte[size];
+
+                Read(address, Buffer, size);
+                Marshal.Copy(Buffer, 0, ptr, size);
+
+                return Marshal.PtrToStructure<T>(ptr);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(ptr);
+            }
         }
 
         /// <summary>
