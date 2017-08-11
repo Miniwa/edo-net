@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("edo-net")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Edo")]
+[assembly: AssemblyDescription(".NET implementation of the Edo framework")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("edo-net")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyProduct("Edo")]
+[assembly: AssemblyCopyright("Copyright © 2017 miniwa")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
