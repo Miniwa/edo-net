@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Edo.Windows
+namespace Edo.Native
 {
     /// <summary>
     /// Wraps methods imported from the windows api
