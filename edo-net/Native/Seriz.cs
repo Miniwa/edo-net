@@ -33,7 +33,7 @@ namespace Edo.Native
 
             T[] values = new T[1];
             values[0] = value;
-            SerializeArray(values, buffer);
+            Serialize(values, buffer);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Edo.Native
         /// <param name="values">The array of values to be serialized</param>
         /// <param name="buffer">The buffer to write the resulting bytes to</param>
         /// <exception cref="ArgumentException">If buffer is too small to fit the data</exception>
-        public static void SerializeArray<T>(T[] values, byte[] buffer)
+        public static void Serialize<T>(T[] values, byte[] buffer)
         {
             if(values == null)
                 throw new ArgumentNullException(nameof(values));
@@ -84,7 +84,7 @@ namespace Edo.Native
             if(buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
 
-            return ParseArray<T>(buffer, 1)[0];
+            return Parse<T>(buffer, 1)[0];
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Edo.Native
         /// <returns>The parsed array of structures or instances of a formatted class</returns>
         /// <exception cref="ArgumentException">If the buffer is too small to fit the requested data</exception>
         /// <exception cref="ArgumentException">If the element count is zero or a negative integer</exception>
-        public static T[] ParseArray<T>(byte[] buffer, Int32 count)
+        public static T[] Parse<T>(byte[] buffer, Int32 count)
         {
             if(buffer == null)
                 throw new ArgumentNullException(nameof(buffer));

@@ -64,7 +64,7 @@ namespace Edo
             numbers[2] = 9873748;
 
             Stream.SetLength(12);
-            Seriz.SerializeArray(numbers, Stream.GetBuffer());
+            Seriz.Serialize(numbers, Stream.GetBuffer());
 
             Assert.AreEqual(numbers[0], Reader.ReadInt32());
             Assert.AreEqual(numbers[1], Reader.ReadInt32());
@@ -76,21 +76,21 @@ namespace Edo
         public void TestSerializeArrayThrowsOnNullValues()
         {
             byte[] values = null;
-            Seriz.SerializeArray(values, Buffer);
+            Seriz.Serialize(values, Buffer);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestSerializeArrayThrowsOnNullBuffer()
         {
-            Seriz.SerializeArray(new byte[4], null);
+            Seriz.Serialize(new byte[4], null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestSerializeArrayThrowsIfBufferTooSmall()
         {
-            Seriz.SerializeArray(new byte[18], new byte[17]);
+            Seriz.Serialize(new byte[18], new byte[17]);
         }
 
         [TestMethod]
@@ -126,7 +126,7 @@ namespace Edo
             Writer.Write(number2);
             Writer.Write(number3);
 
-            Int32[] results = Seriz.ParseArray<Int32>(Stream.GetBuffer(), 3);
+            Int32[] results = Seriz.Parse<Int32>(Stream.GetBuffer(), 3);
             Assert.AreEqual(3, results.Length);
             Assert.AreEqual(number1, results[0]);
             Assert.AreEqual(number2, results[1]);
@@ -137,21 +137,21 @@ namespace Edo
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestParseArrayThrowsOnNullBuffer()
         {
-            Seriz.ParseArray<Int32>(null, 1);
+            Seriz.Parse<Int32>(null, 1);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestParseArrayThrowsOnZeroCount()
         {
-            Seriz.ParseArray<Int32>(Buffer, 0);
+            Seriz.Parse<Int32>(Buffer, 0);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestParseArrayThrowsIfBufferIsTooSmall()
         {
-            Seriz.ParseArray<Int32>(new byte[10], 3);
+            Seriz.Parse<Int32>(new byte[10], 3);
         }
 
         [TestMethod]
@@ -188,8 +188,8 @@ namespace Edo
             values[1] = new MockVector(1230.123f, 1298.443f, 587.183f);
             values[2] = new MockVector(12323204.123f, 1259548.4143f, 583287.1f);
 
-            Seriz.SerializeArray(values, Buffer);
-            MockVector[] results = Seriz.ParseArray<MockVector>(Buffer, values.Length);
+            Seriz.Serialize(values, Buffer);
+            MockVector[] results = Seriz.Parse<MockVector>(Buffer, values.Length);
 
             Assert.AreEqual(values.Length, results.Length);
             for (int i = 0; i < values.Length; i++)
@@ -208,8 +208,8 @@ namespace Edo
             values[1] = new MockClass(19232299994, 14231234.123022230f, 867823.27374f, 4888484, 858828844);
             values[2] = new MockClass(1923269994, 1434531234.123042230f, 83467823.27374f, 466888484, 8588283453844);
 
-            Seriz.SerializeArray(values, Buffer);
-            MockClass[] results = Seriz.ParseArray<MockClass>(Buffer, values.Length);
+            Seriz.Serialize(values, Buffer);
+            MockClass[] results = Seriz.Parse<MockClass>(Buffer, values.Length);
 
             Assert.AreEqual(values.Length, results.Length);
             for (int i = 0; i < values.Length; i++)
