@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Edo.Native;
 using Microsoft.Win32.SafeHandles;
 
-
 namespace Edo
 {
     /// <summary>
@@ -139,22 +138,11 @@ namespace Edo
         public T Read<T>(IntPtr address)
         {
             int size = Marshal.SizeOf<T>();
-            IntPtr ptr = Marshal.AllocHGlobal(size);
+            if(Buffer.Length < size)
+                Buffer = new byte[size];
 
-            try
-            {
-                if(Buffer.Length < size)
-                    Buffer = new byte[size];
-
-                Read(address, Buffer, size);
-                Marshal.Copy(Buffer, 0, ptr, size);
-
-                return Marshal.PtrToStructure<T>(ptr);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
-            }
+            Read(address, Buffer, size);
+            return Seriz.Parse<T>(Buffer);
         }
 
         /// <summary>
@@ -219,22 +207,11 @@ namespace Edo
                 throw new ArgumentNullException(nameof(value));
 
             int size = Marshal.SizeOf(value);
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-
-            try
-            {
-                if (Buffer.Length < size)
-                    Buffer = new byte[size];
-
-                Marshal.StructureToPtr(value, ptr, false);
-                Marshal.Copy(ptr, Buffer, 0, size);
-
-                Write(address, Buffer, size);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
-            }
+            if (Buffer.Length < size)
+                Buffer = new byte[size];
+            
+            Seriz.Serialize<T>(value, Buffer);
+            Write(address, Buffer, size);
         }
 
         /// <summary>
