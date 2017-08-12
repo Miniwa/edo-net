@@ -4,35 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Edo.Mock;
 
 namespace Edo
 {
-    struct MockVector
-    {
-        public Single X;
-        public Single Y;
-        public Single Z;
-    }
-
-    [StructLayout(LayoutKind.Explicit, Size = 32)]
-    class MockClass
-    {
-        [FieldOffset(0)]
-        public Int64 value1;
-
-        [FieldOffset(8)]
-        public Double value2;
-
-        [FieldOffset(16)]
-        public Single value3;
-
-        [FieldOffset(20)]
-        public UInt32 value4;
-
-        [FieldOffset(24)]
-        public UInt64 value5;
-    }
-
     [TestClass]
     public class VirtualMemoryTest
     {
