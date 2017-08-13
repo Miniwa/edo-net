@@ -30,7 +30,7 @@ namespace Edo
         /// <param name="desiredAccess">The desired access rights</param>
         /// <exception cref="InvalidOperationException">If a target is already open</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public void Open(Int32 id, ProcessAccessRights desiredAccess)
+        public void Open(UInt32 id, ProcessAccessRights desiredAccess)
         {
             if(IsOpen)
                 throw new InvalidOperationException("A virtual memory has already been targeted");
@@ -54,7 +54,7 @@ namespace Edo
             if(process == null)
                 throw new ArgumentNullException(nameof(process));
 
-            Open(process.Id, desiredAccess);
+            Open(Convert.ToUInt32(process.Id), desiredAccess);
         }
 
         /// <summary>
@@ -98,11 +98,13 @@ namespace Edo
             if (!IsOpen)
                 throw new InvalidOperationException("A virtual memory must be targeted before read operations are available");
 
-            int nrBytesRead = 0;
-            if (!WinApi.ReadProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer, count, ref nrBytesRead))
+            UIntPtr nrBytesRead;
+            UInt32 unsignedCount = Convert.ToUInt32(count);
+            if (!WinApi.ReadProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer,
+                new UIntPtr(unsignedCount), out nrBytesRead))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform read operation");
 
-            if (nrBytesRead != count)
+            if (nrBytesRead.ToUInt32() != unsignedCount)
                 throw new InvalidOperationException(string.Format("Operation only read {0} out of {1} wanted bytes", nrBytesRead, count));
         }
 
@@ -188,11 +190,13 @@ namespace Edo
             if (!IsOpen)
                 throw new InvalidOperationException("A virtual memory must be targeted before write operations are available");
 
-            int nrBytesWritten = 0;
-            if(!WinApi.WriteProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer, count, ref nrBytesWritten))
+            UInt32 unsignedCount = Convert.ToUInt32(count);
+            UIntPtr nrBytesWritten;
+            if(!WinApi.WriteProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer,
+                new UIntPtr(unsignedCount), out nrBytesWritten))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform write operation");
 
-            if(nrBytesWritten != count)
+            if(nrBytesWritten.ToUInt32() != unsignedCount)
                 throw new InvalidOperationException(string.Format("Operation only wrote {0} out of {1} wanted bytes", nrBytesWritten, count));
         }
 

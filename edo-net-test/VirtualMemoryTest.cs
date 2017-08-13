@@ -64,7 +64,7 @@ namespace Edo
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenThrowsOnApiError()
         {
-            ClosedMemory.Open(-1, ProcessAccessRights.AllAccess);
+            ClosedMemory.Open(0, ProcessAccessRights.AllAccess);
         }
 
         [TestMethod]

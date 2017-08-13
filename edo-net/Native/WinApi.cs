@@ -9,14 +9,14 @@ namespace Edo.Native
     public static class WinApi
     {
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr OpenProcess(ProcessAccessRights desiredAccess, Boolean inheritHandle, Int32 processId);
+        public static extern IntPtr OpenProcess([In] ProcessAccessRights desiredAccess, [In] Boolean inheritHandle, [In] UInt32 processId);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern Boolean ReadProcessMemory(IntPtr processHandle, IntPtr address, byte[] buffer,
-            Int32 nrBytesToRead, ref Int32 nrBytesRead);
+        public static extern Boolean ReadProcessMemory([In] IntPtr processHandle, [In] IntPtr address, [Out] byte[] buffer,
+            [In] UIntPtr nrBytesToRead, [Out] out UIntPtr nrBytesRead);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern Boolean WriteProcessMemory(IntPtr processHandle, IntPtr address, byte[] buffer,
-            Int32 nrBytesToWrite, ref Int32 nrBytesWritten);
+        public static extern Boolean WriteProcessMemory([In] IntPtr processHandle, [In] IntPtr address, [Out] byte[] buffer,
+            [In] UIntPtr nrBytesToWrite, [Out] out UIntPtr nrBytesWritten);
     }
 }
