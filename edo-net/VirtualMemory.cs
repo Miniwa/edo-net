@@ -255,7 +255,7 @@ namespace Edo
             if(Buffer.Length < totalSize)
                 Buffer = new byte[totalSize];
 
-            Seriz.Serialize(values, Buffer);
+            Seriz.Serialize(Buffer, values);
             Write(address, Buffer, totalSize);
         }
 

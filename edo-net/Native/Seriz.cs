@@ -16,10 +16,10 @@ namespace Edo.Native
         /// Serializes a given structure or instance of a formatted class to bytes and writes the bytes into given buffer
         /// </summary>
         /// <typeparam name="T">The type of structure or formatted class to be serialized</typeparam>
-        /// <param name="value">The value to ve serialized</param>
         /// <param name="buffer">The buffer to write the resulting bytes to</param>
+        /// <param name="value">The value to ve serialized</param>
         /// <exception cref="ArgumentException">If buffer is too small to fit the data</exception>
-        public static void Serialize<T>(T value, byte[] buffer)
+        public static void Serialize<T>(byte[] buffer, T value)
         {
             if(value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -33,23 +33,26 @@ namespace Edo.Native
 
             T[] values = new T[1];
             values[0] = value;
-            Serialize(values, buffer);
+            Serialize(buffer, values);
         }
 
         /// <summary>
         /// Serializes an array of given structures or instances of a formatted class to bytes and writes the bytes into given buffer
         /// </summary>
         /// <typeparam name="T">The type of structure or formatted class to be serialized</typeparam>
-        /// <param name="values">The array of values to be serialized</param>
         /// <param name="buffer">The buffer to write the resulting bytes to</param>
+        /// <param name="values">The array of values to be serialized</param>
         /// <exception cref="ArgumentException">If buffer is too small to fit the data</exception>
-        public static void Serialize<T>(T[] values, byte[] buffer)
+        public static void Serialize<T>(byte[] buffer, T[] values)
         {
             if(values == null)
                 throw new ArgumentNullException(nameof(values));
             
             if(buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
+
+            if(values.Length == 0)
+                throw new ArgumentException("Cannot serialize an array of length zero");
 
             int size = Marshal.SizeOf<T>();
             int totalSize = size * values.Length;
