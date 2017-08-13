@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Edo.Native;
+using Edo.Windows;
 using Microsoft.Win32.SafeHandles;
 
 namespace Edo
@@ -36,7 +33,7 @@ namespace Edo
             if(IsOpen)
                 throw new InvalidOperationException("A virtual memory has already been targeted");
 
-            IntPtr handle = WinApi.OpenProcess(desiredAccess, false, id);
+            IntPtr handle = Api.OpenProcess(desiredAccess, false, id);
             if (handle.IsNullPtr())
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not open handle to process");
 
@@ -103,7 +100,7 @@ namespace Edo
 
             UIntPtr nrBytesRead;
             UInt32 unsignedCount = Convert.ToUInt32(count);
-            if (!WinApi.ReadProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer,
+            if (!Api.ReadProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer,
                 new UIntPtr(unsignedCount), out nrBytesRead))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform read operation");
 
@@ -195,7 +192,7 @@ namespace Edo
 
             UInt32 unsignedCount = Convert.ToUInt32(count);
             UIntPtr nrBytesWritten;
-            if(!WinApi.WriteProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer,
+            if(!Api.WriteProcessMemory(ProcessHandle.DangerousGetHandle(), address, buffer,
                 new UIntPtr(unsignedCount), out nrBytesWritten))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform write operation");
 
@@ -275,7 +272,7 @@ namespace Edo
         {
             get
             {
-                IntPtr snapshot = WinApi.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, ProcessId);
+                IntPtr snapshot = Api.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, ProcessId);
                 if(snapshot.IsInvalidHandle())
                     throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create module snapshot");
 
@@ -283,7 +280,7 @@ namespace Edo
                 {
                     ModuleEntry32 moduleEntry = new ModuleEntry32();
                     moduleEntry.StructSize = Convert.ToUInt32(Marshal.SizeOf<ModuleEntry32>());
-                    if (!WinApi.Module32First(snapshot, ref moduleEntry))
+                    if (!Api.Module32First(snapshot, ref moduleEntry))
                         throw new Win32Exception(Marshal.GetLastWin32Error(),
                             "Could not load the first module from the snapshot");
 
@@ -297,7 +294,7 @@ namespace Edo
 
                         modules.Add(module);
                     }
-                    while (WinApi.Module32Next(snapshot, ref moduleEntry));
+                    while (Api.Module32Next(snapshot, ref moduleEntry));
 
                     int code = Marshal.GetLastWin32Error();
                     if(code != (int)ErrorCodes.NoMoreFiles)
@@ -307,7 +304,7 @@ namespace Edo
                 }
                 finally
                 {
-                    if(!WinApi.CloseHandle(snapshot))
+                    if(!Api.CloseHandle(snapshot))
                         throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not close snapshot handle");
                 }
             }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Edo.Native;
+using Edo.Windows;
 
 namespace Edo
 {

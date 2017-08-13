@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Edo.Native
+namespace Edo.Windows
 {
     /// <summary>
     /// An enumeration of standard access flags within the windows api

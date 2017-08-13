@@ -1,5 +1,5 @@
 ﻿using System;
-using Edo.Native;
+using Edo.Windows;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Edo

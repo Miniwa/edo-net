@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Edo.Native
+﻿namespace Edo.Windows
 {
     /// <summary>
     /// An enumeration of windows api error codes

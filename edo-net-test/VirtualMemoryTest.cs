@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Edo.Mock;
-using Edo.Native;
+using Edo.Windows;
 
 namespace Edo
 {

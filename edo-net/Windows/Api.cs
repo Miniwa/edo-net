@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Edo.Native
+namespace Edo.Windows
 {
     /// <summary>
-    /// Wraps methods imported from the windows api
+    /// Wraps functions imported from the windows api
     /// </summary>
-    public static class WinApi
+    public static class Api
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr OpenProcess([In] ProcessAccessRights desiredAccess, [In] Boolean inheritHandle, [In] UInt32 processId);

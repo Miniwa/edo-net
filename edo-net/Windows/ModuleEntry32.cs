@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Edo.Native
+namespace Edo.Windows
 {
     /// <summary>
     /// Represents the windows api structure MODULEENTRY32
