@@ -25,7 +25,7 @@ namespace Edo
         public void Init()
         {
             Memory = new VirtualMemory();
-            Memory.Open(Process.GetCurrentProcess());
+            Memory.Open(Process.GetCurrentProcess(), ProcessAccessRights.AllAccess);
             ClosedMemory = new VirtualMemory();
             OutStream.Seek(0, SeekOrigin.Begin);
             OutStream.SetLength(0);
@@ -40,7 +40,7 @@ namespace Edo
         [TestMethod]
         public void TestOpen()
         {
-            ClosedMemory.Open(Process.GetCurrentProcess());
+            ClosedMemory.Open(Process.GetCurrentProcess(), ProcessAccessRights.AllAccess);
             Assert.IsTrue(ClosedMemory.IsOpen);
             Assert.IsNotNull(ClosedMemory.ProcessHandle);
         }
@@ -49,28 +49,28 @@ namespace Edo
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestOpenThrowsOnNull()
         {
-            ClosedMemory.Open(null);
+            ClosedMemory.Open(null, ProcessAccessRights.AllAccess);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestOpenWhenAlreadyOpen()
         {
-            ClosedMemory.Open(Process.GetCurrentProcess());
-            ClosedMemory.Open(1);
+            ClosedMemory.Open(Process.GetCurrentProcess(), ProcessAccessRights.AllAccess);
+            ClosedMemory.Open(1, ProcessAccessRights.AllAccess);
         }
 
         [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenThrowsOnApiError()
         {
-            ClosedMemory.Open(-1);
+            ClosedMemory.Open(-1, ProcessAccessRights.AllAccess);
         }
 
         [TestMethod]
         public void TestClose()
         {
-            ClosedMemory.Open(Process.GetCurrentProcess());
+            ClosedMemory.Open(Process.GetCurrentProcess(), ProcessAccessRights.AllAccess);
             ClosedMemory.Close();
             Assert.IsFalse(ClosedMemory.IsOpen);
             Assert.IsNull(ClosedMemory.ProcessHandle);

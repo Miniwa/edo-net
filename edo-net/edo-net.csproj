@@ -42,7 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntPtrExtension.cs" />
+    <Compile Include="Native\ProcessAccessRights.cs" />
     <Compile Include="Native\Seriz.cs" />
+    <Compile Include="Native\StandardAccessRights.cs" />
     <Compile Include="VirtualMemory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Native\WinApi.cs" />

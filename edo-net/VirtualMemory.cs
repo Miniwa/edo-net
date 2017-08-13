@@ -27,14 +27,15 @@ namespace Edo
         /// Opens and targets the virtual memory of process with given id
         /// </summary>
         /// <param name="id">The id of the process to be opened</param>
+        /// <param name="desiredAccess">The desired access rights</param>
         /// <exception cref="InvalidOperationException">If a target is already open</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public void Open(Int32 id)
+        public void Open(Int32 id, ProcessAccessRights desiredAccess)
         {
             if(IsOpen)
                 throw new InvalidOperationException("A virtual memory has already been targeted");
 
-            IntPtr handle = WinApi.OpenProcess(WinApi.PROCESS_VM_ALL_ACCESS, false, id);
+            IntPtr handle = WinApi.OpenProcess(desiredAccess, false, id);
             if (handle.IsNullPtr())
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not open handle to process");
 
@@ -45,14 +46,15 @@ namespace Edo
         /// Opens and targets the virtual memory of given process
         /// </summary>
         /// <param name="process">The process to be opened</param>
+        /// <param name="desiredAccess">The desired access rights</param>
         /// <exception cref="InvalidOperationException">If a target is already open</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public void Open(Process process)
+        public void Open(Process process, ProcessAccessRights desiredAccess)
         {
             if(process == null)
                 throw new ArgumentNullException(nameof(process));
 
-            Open(process.Id);
+            Open(process.Id, desiredAccess);
         }
 
         /// <summary>
