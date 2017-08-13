@@ -382,7 +382,7 @@ namespace Edo
         }
 
         [TestMethod]
-        public unsafe void TestWriteTWithFormattedClassArgument()
+        public void TestWriteTWithFormattedClassArgument()
         {
             MockClass test = new MockClass();
             test.value1 = 10231;
@@ -471,7 +471,7 @@ namespace Edo
         }
 
         [TestMethod]
-        public unsafe void TestWriteReadTArray()
+        public void TestWriteReadTArray()
         {
             Int32[] numbers = new int[3]
             {
@@ -498,7 +498,7 @@ namespace Edo
         }
 
         [TestMethod]
-        public unsafe void TestWriteReadTArrayStructure()
+        public void TestWriteReadTArrayStructure()
         {
             MockVector[] vectors = new MockVector[3]
             {
@@ -528,7 +528,7 @@ namespace Edo
         }
 
         [TestMethod]
-        public unsafe void TestWriteReadTArrayFormattedClass()
+        public void TestWriteReadTArrayFormattedClass()
         {
             MockClass[] classes = new MockClass[3]
             {

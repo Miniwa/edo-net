@@ -59,7 +59,7 @@ namespace Edo.Native
             if(buffer.Length < totalSize)
                 throw new ArgumentException("Buffer is too small to fit requested data");
 
-            IntPtr address = Marshal.AllocHGlobal(size);
+            IntPtr address = Marshal.AllocHGlobal(totalSize);
             try
             {
                 for (int i = 0; i < values.Length; i++)
