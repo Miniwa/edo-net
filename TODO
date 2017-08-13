@@ -1,2 +1,4 @@
 Implement stream methods in Seriz module
+Rework Native namespace
+Create framework specific exception types
 More proper testing of array methods in Seriz and VirtualMemory

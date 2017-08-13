@@ -20,6 +20,7 @@ namespace Edo
         public VirtualMemory()
         {
             ProcessHandle = null;
+            ProcessId = 0;
             Buffer = new byte[16];
         }
 
@@ -39,6 +40,7 @@ namespace Edo
             if (handle.IsNullPtr())
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not open handle to process");
 
+            ProcessId = id;
             ProcessHandle = new SafeProcessHandle(handle, true);
         }
 
@@ -64,6 +66,7 @@ namespace Edo
         {
             if (IsOpen)
             {
+                ProcessId = 0;
                 ProcessHandle.Close();
                 ProcessHandle = null;
             }
@@ -266,9 +269,59 @@ namespace Edo
         }
 
         /// <summary>
+        /// The collection of modules that are loaded into this process virtual memory
+        /// </summary>
+        public ICollection<Module> Modules
+        {
+            get
+            {
+                IntPtr snapshot = WinApi.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, ProcessId);
+                if(snapshot.IsInvalidHandle())
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create module snapshot");
+
+                try
+                {
+                    ModuleEntry32 moduleEntry = new ModuleEntry32();
+                    moduleEntry.StructSize = Convert.ToUInt32(Marshal.SizeOf<ModuleEntry32>());
+                    if (!WinApi.Module32First(snapshot, ref moduleEntry))
+                        throw new Win32Exception(Marshal.GetLastWin32Error(),
+                            "Could not load the first module from the snapshot");
+
+                    List<Module> modules = new List<Module>();
+                    do
+                    {
+                        Module module = new Module();
+                        module.BaseAddress = moduleEntry.BaseAddress;
+                        module.BaseSize = Convert.ToInt32(moduleEntry.BaseSize);
+                        module.FullPath = moduleEntry.FullPath;
+
+                        modules.Add(module);
+                    }
+                    while (WinApi.Module32Next(snapshot, ref moduleEntry));
+
+                    int code = Marshal.GetLastWin32Error();
+                    if(code != (int)ErrorCodes.NoMoreFiles)
+                        throw new Win32Exception(code, "Could not load the next module from the snapshot");
+
+                    return modules;
+                }
+                finally
+                {
+                    if(!WinApi.CloseHandle(snapshot))
+                        throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not close snapshot handle");
+                }
+            }
+        }
+
+        /// <summary>
         /// Handle to the currently open process
         /// </summary>
         public SafeProcessHandle ProcessHandle { get; private set; }
+
+        /// <summary>
+        /// The id of the currently open process
+        /// </summary>
+        public UInt32 ProcessId { get; private set; }
 
         /// <summary>
         /// Internal buffer used in some operations

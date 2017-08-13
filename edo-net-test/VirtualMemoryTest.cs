@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Edo.Mock;
@@ -556,6 +557,22 @@ namespace Edo
             finally
             {
                 Marshal.FreeHGlobal(address);
+            }
+        }
+
+        [TestMethod]
+        public void TestModules()
+        {
+            var modules = Process.GetCurrentProcess().Modules;
+            var results = Memory.Modules;
+
+            Assert.AreEqual(modules.Count, results.Count);
+            foreach (ProcessModule module in modules)
+            {
+                var match = results.Single(mod => module.FileName == mod.FullPath);
+                Assert.AreEqual(module.ModuleName, match.FileName);
+                Assert.AreEqual(module.BaseAddress, match.BaseAddress);
+                Assert.AreEqual(module.ModuleMemorySize, match.BaseSize);
             }
         }
 

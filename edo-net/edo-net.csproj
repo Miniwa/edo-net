@@ -42,6 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntPtrExtension.cs" />
+    <Compile Include="Module.cs" />
+    <Compile Include="Native\Constants.cs" />
+    <Compile Include="Native\ErrorCodes.cs" />
+    <Compile Include="Native\ModuleEntry32.cs" />
     <Compile Include="Native\ProcessAccessRights.cs" />
     <Compile Include="Native\Seriz.cs" />
     <Compile Include="Native\SnapshotFlags.cs" />
