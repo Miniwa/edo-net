@@ -137,12 +137,32 @@ namespace Edo
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
         public T Read<T>(IntPtr address)
         {
-            int size = Marshal.SizeOf<T>();
-            if(Buffer.Length < size)
-                Buffer = new byte[size];
+            return Read<T>(address, 1)[0];
+        }
 
-            Read(address, Buffer, size);
-            return Seriz.Parse<T>(Buffer);
+        /// <summary>
+        /// Reads an array of structures or instances of a formatted class from given address in target virtual memory
+        /// </summary>
+        /// <typeparam name="T">The type of structure or formatted class to be read</typeparam>
+        /// <param name="address">The address to be read from</param>
+        /// <param name="count">The number of elements in the array to be read</param>
+        /// <returns>The array of structures or instances read from virtual memory</returns>
+        /// <exception cref="InvalidOperationException">If no virtual memory has been targeted</exception>
+        /// <exception cref="Win32Exception">On Windows API error</exception>
+        /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
+        /// <exception cref="ArgumentException">If element count is zero or a negative integer</exception>
+        public T[] Read<T>(IntPtr address, Int32 count)
+        {
+            if(count <= 0)
+                throw new ArgumentException("Element count must be a positive integer");
+
+            int size = Marshal.SizeOf<T>();
+            int totalSize = size * count;
+            if(Buffer.Length < totalSize)
+                Buffer = new byte[totalSize];
+
+            Read(address, Buffer, totalSize);
+            return Seriz.Parse<T>(Buffer, count);
         }
 
         /// <summary>
@@ -201,17 +221,42 @@ namespace Edo
         /// <typeparam name="T">The type of the structure or formatted class to be written</typeparam>
         /// <param name="address">The address to be written to</param>
         /// <param name="value">The structure or instance of a formatted class to be written</param>
+        /// <exception cref="InvalidOperationException">If no virtual memory has been targeted</exception>
+        /// <exception cref="Win32Exception">On Windows API error</exception>
+        /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were written</exception>
         public void Write<T>(IntPtr address, T value)
         {
             if(value == null)
                 throw new ArgumentNullException(nameof(value));
-
-            int size = Marshal.SizeOf(value);
-            if (Buffer.Length < size)
-                Buffer = new byte[size];
             
-            Seriz.Serialize<T>(value, Buffer);
-            Write(address, Buffer, size);
+            Write(address, new T[] {value});
+        }
+
+        /// <summary>
+        /// Writes an array of structures or instances of a formatted class to given address in target virtual memory
+        /// </summary>
+        /// <typeparam name="T">The type of the structure or formatted class to be written</typeparam>
+        /// <param name="address">The address to be written to</param>
+        /// <param name="values">The array of structures or instances of a formatted class to be written</param>
+        /// <exception cref="InvalidOperationException">If no virtual memory has been targeted</exception>
+        /// <exception cref="Win32Exception">On Windows API error</exception>
+        /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were written</exception>
+        /// <exception cref="ArgumentException">If the given array is empty</exception>
+        public void Write<T>(IntPtr address, T[] values)
+        {
+            if(values == null)
+                throw new ArgumentNullException(nameof(values));
+
+            if(values.Length == 0)
+                throw new ArgumentException("Cannot write an empty array");
+
+            int size = Marshal.SizeOf<T>();
+            int totalSize = size * values.Length;
+            if(Buffer.Length < totalSize)
+                Buffer = new byte[totalSize];
+
+            Seriz.Serialize(values, Buffer);
+            Write(address, Buffer, totalSize);
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Edo.Mock;
+using Edo.Native;
 
 namespace Edo
 {
@@ -251,6 +252,13 @@ namespace Edo
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestReadTArrayThrowsOnZeroNegativeElementCount()
+        {
+            Memory.Read<Int32>(IntPtr.Zero, 0);
+        }
+
+        [TestMethod]
         public unsafe void TestWrite()
         {
             int number = 30;
@@ -443,7 +451,112 @@ namespace Edo
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestWriteTThrowsOnNull()
         {
-            Memory.Write<MockClass>(IntPtr.Zero, null);
+            MockClass value = null;
+            Memory.Write<MockClass>(IntPtr.Zero, value);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestWriteTArrayThrowsOnNullArray()
+        {
+            Int32[] values = null;
+            Memory.Write(IntPtr.Zero, values);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestWriteTArrayThrowsOnZeroArray()
+        {
+            Memory.Write<Int32>(IntPtr.Zero, new Int32[0]);
+        }
+
+        [TestMethod]
+        public unsafe void TestWriteReadTArray()
+        {
+            Int32[] numbers = new int[3]
+            {
+                1235,
+                5923,
+                5818828
+            };
+
+            IntPtr address = Marshal.AllocHGlobal(numbers.Length * Marshal.SizeOf<Int32>());
+            try
+            {
+                Memory.Write(address, numbers);
+                Int32[] results = Memory.Read<Int32>(address, 3);
+
+                Assert.AreEqual(numbers.Length, results.Length);
+                Assert.AreEqual(numbers[0], results[0]);
+                Assert.AreEqual(numbers[1], results[1]);
+                Assert.AreEqual(numbers[2], results[2]);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(address);
+            }
+        }
+
+        [TestMethod]
+        public unsafe void TestWriteReadTArrayStructure()
+        {
+            MockVector[] vectors = new MockVector[3]
+            {
+                new MockVector(12344.12323f, 177733.123f, 84717.1234f),
+                new MockVector(1232444.12323f, 17237733.123f, 847317.1234f),
+                new MockVector(1344.123f, 1733.123f, 717.1234f)
+            };
+
+            IntPtr address = Marshal.AllocHGlobal(vectors.Length * Marshal.SizeOf<MockVector>());
+            try
+            {
+                Memory.Write(address, vectors);
+                MockVector[] results = Memory.Read<MockVector>(address, 3);
+
+                Assert.AreEqual(vectors.Length, results.Length);
+                for (int i = 0; i < vectors.Length; i++)
+                {
+                    Assert.AreEqual(vectors[i].X, results[i].X);
+                    Assert.AreEqual(vectors[i].Y, results[i].Y);
+                    Assert.AreEqual(vectors[i].Z, results[i].Z);
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(address);
+            }
+        }
+
+        [TestMethod]
+        public unsafe void TestWriteReadTArrayFormattedClass()
+        {
+            MockClass[] classes = new MockClass[3]
+            {
+                new MockClass(1823825882, 19242342.12312312f, 12312387.132123f, 919484882, 78787237472374),
+                new MockClass(18382882, 192342.1231312f, 1212387.13123f, 9184882, 7878723742372374),
+                new MockClass(18238252882, 192422342.123123132f, 123123827.1322123f, 91948882, 78787823472374)
+            };
+
+            IntPtr address = Marshal.AllocHGlobal(classes.Length * Marshal.SizeOf<MockClass>());
+            try
+            {
+                Memory.Write(address, classes);
+                MockClass[] results = Memory.Read<MockClass>(address, 3);
+
+                Assert.AreEqual(classes.Length, results.Length);
+                for (int i = 0; i < classes.Length; i++)
+                {
+                    Assert.AreEqual(classes[i].value1, results[i].value1);
+                    Assert.AreEqual(classes[i].value2, results[i].value2);
+                    Assert.AreEqual(classes[i].value3, results[i].value3);
+                    Assert.AreEqual(classes[i].value4, results[i].value4);
+                    Assert.AreEqual(classes[i].value5, results[i].value5);
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(address);
+            }
         }
 
         public VirtualMemory Memory { get; set; }
