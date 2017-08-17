@@ -60,7 +60,7 @@
     <Compile Include="Mock\MockClass.cs" />
     <Compile Include="Mock\MockVector.cs" />
     <Compile Include="SerizTest.cs" />
-    <Compile Include="VirtualMemoryTest.cs" />
+    <Compile Include="ProcessTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
