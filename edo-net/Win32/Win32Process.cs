@@ -62,7 +62,7 @@ namespace Edo.Win32
         /// <exception cref="ArgumentException">If buffer is too small to fit the requested data</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
-        public void ReadMemory(IntPtr address, byte[] buffer, Int32 count)
+        public void Read(IntPtr address, byte[] buffer, Int32 count)
         {
             if(buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
@@ -93,7 +93,7 @@ namespace Edo.Win32
         /// <exception cref="ArgumentException">If buffer is too small to fit the requested data</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
-        public void ReadMemory(IntPtr address, Stream outStream, Int32 count)
+        public void Read(IntPtr address, Stream outStream, Int32 count)
         {
             if(outStream == null)
                 throw new ArgumentNullException(nameof(outStream));
@@ -104,7 +104,7 @@ namespace Edo.Win32
             if (count > Buffer.Length)
                 Buffer = new byte[count];
 
-            ReadMemory(address, Buffer, count);
+            Read(address, Buffer, count);
             outStream.Write(Buffer, 0, count);
         }
 
@@ -116,9 +116,9 @@ namespace Edo.Win32
         /// <returns>The structure or instance read from virtual memory of the process</returns>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
-        public T ReadMemory<T>(IntPtr address)
+        public T Read<T>(IntPtr address)
         {
-            return ReadMemory<T>(address, 1)[0];
+            return Read<T>(address, 1)[0];
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Edo.Win32
         /// <exception cref="ArgumentException">If count is equal to or less than zero</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were read</exception>
-        public T[] ReadMemory<T>(IntPtr address, Int32 count)
+        public T[] Read<T>(IntPtr address, Int32 count)
         {
             if(count <= 0)
                 throw new ArgumentException("Count must be greater than zero");
@@ -141,7 +141,7 @@ namespace Edo.Win32
             if(Buffer.Length < totalSize)
                 Buffer = new byte[totalSize];
 
-            ReadMemory(address, Buffer, totalSize);
+            Read(address, Buffer, totalSize);
             return Seriz.Parse<T>(Buffer, count);
         }
 
@@ -155,7 +155,7 @@ namespace Edo.Win32
         /// <exception cref="ArgumentException">If buffer is too small to fit the requested data</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were written</exception>
-        public void WriteMemory(IntPtr address, byte[] buffer, Int32 count)
+        public void Write(IntPtr address, byte[] buffer, Int32 count)
         {
             if(buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
@@ -185,7 +185,7 @@ namespace Edo.Win32
         /// <exception cref="ArgumentException">If count is equal to or less than zero</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were written</exception>
-        public void WriteMemory(IntPtr address, Stream stream, Int32 count)
+        public void Write(IntPtr address, Stream stream, Int32 count)
         {
             if(stream == null)
                 throw new ArgumentNullException(nameof(stream));
@@ -197,7 +197,7 @@ namespace Edo.Win32
                 Buffer = new byte[count];
 
             stream.Read(Buffer, 0, count);
-            WriteMemory(address, Buffer, count);
+            Write(address, Buffer, count);
         }
 
         /// <summary>
@@ -208,12 +208,12 @@ namespace Edo.Win32
         /// <param name="value">The structure or instance of a formatted class to be written</param>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were written</exception>
-        public void WriteMemory<T>(IntPtr address, T value)
+        public void Write<T>(IntPtr address, T value)
         {
             if(value == null)
                 throw new ArgumentNullException(nameof(value));
             
-            WriteMemory(address, new T[] {value});
+            Write(address, new T[] {value});
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace Edo.Win32
         /// <exception cref="ArgumentException">If the given array is empty</exception>
         /// <exception cref="Win32Exception">On Windows API error</exception>
         /// <exception cref="InvalidOperationException">If the call succeeds but too few bytes were written</exception>
-        public void WriteMemory<T>(IntPtr address, T[] values)
+        public void Write<T>(IntPtr address, T[] values)
         {
             if(values == null)
                 throw new ArgumentNullException(nameof(values));
@@ -239,7 +239,7 @@ namespace Edo.Win32
                 Buffer = new byte[totalSize];
 
             Seriz.Serialize(Buffer, values);
-            WriteMemory(address, Buffer, totalSize);
+            Write(address, Buffer, totalSize);
         }
 
         /// <summary>

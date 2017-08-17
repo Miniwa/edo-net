@@ -58,7 +58,7 @@ namespace Edo
             IntPtr address = (IntPtr)(&number);
 
             OutStream.SetLength(4);
-            Proc.ReadMemory(address, OutStream.GetBuffer(), 4);
+            Proc.Read(address, OutStream.GetBuffer(), 4);
             Assert.AreEqual(number, Reader.ReadInt32());
         }
 
@@ -68,7 +68,7 @@ namespace Edo
             int number = 30;
             IntPtr address = (IntPtr)(&number);
 
-            Proc.ReadMemory(address, OutStream, 4);
+            Proc.Read(address, OutStream, 4);
             OutStream.Seek(0, SeekOrigin.Begin);
             Assert.AreEqual(number, Reader.ReadInt32());
         }
@@ -79,7 +79,7 @@ namespace Edo
             Boolean value = false;
             IntPtr address = (IntPtr)(&value);
 
-            Boolean result = Proc.ReadMemory<Boolean>(address);
+            Boolean result = Proc.Read<Boolean>(address);
             Assert.IsFalse(result);
         }
 
@@ -89,7 +89,7 @@ namespace Edo
             Boolean value = true;
             IntPtr address = (IntPtr)(&value);
 
-            Boolean result = Proc.ReadMemory<Boolean>(address);
+            Boolean result = Proc.Read<Boolean>(address);
             Assert.IsTrue(result);
         }
 
@@ -99,7 +99,7 @@ namespace Edo
             Int32 number = 33123;
             IntPtr address = (IntPtr)(&number);
 
-            Int32 result = Proc.ReadMemory<Int32>(address);
+            Int32 result = Proc.Read<Int32>(address);
             Assert.AreEqual(number, result);
         }
 
@@ -109,7 +109,7 @@ namespace Edo
             Int64 number = 331123222223;
             IntPtr address = (IntPtr)(&number);
 
-            Int64 result = Proc.ReadMemory<Int64>(address);
+            Int64 result = Proc.Read<Int64>(address);
             Assert.AreEqual(number, result);
         }
 
@@ -119,7 +119,7 @@ namespace Edo
             Single number = 1083.123123f;
             IntPtr address = (IntPtr)(&number);
 
-            Single result = Proc.ReadMemory<Single>(address);
+            Single result = Proc.Read<Single>(address);
             Assert.AreEqual(number, result);
         }
 
@@ -129,7 +129,7 @@ namespace Edo
             Double number = 331123222223.123123123f;
             IntPtr address = (IntPtr)(&number);
 
-            Double result = Proc.ReadMemory<Double>(address);
+            Double result = Proc.Read<Double>(address);
             Assert.AreEqual(number, result);
         }
 
@@ -140,7 +140,7 @@ namespace Edo
             IntPtr address = (IntPtr)(&number);
             IntPtr ptrAddress = (IntPtr)(&address);
 
-            IntPtr result = Proc.ReadMemory<IntPtr>(ptrAddress);
+            IntPtr result = Proc.Read<IntPtr>(ptrAddress);
             Assert.AreEqual(address, result);
         }
 
@@ -153,7 +153,7 @@ namespace Edo
             vector.Z = 1222.1123123f;
 
             IntPtr address = (IntPtr)(&vector);
-            MockVector result = Proc.ReadMemory<MockVector>(address);
+            MockVector result = Proc.Read<MockVector>(address);
 
             Assert.AreEqual(vector.X, result.X);
             Assert.AreEqual(vector.Y, result.Y);
@@ -176,7 +176,7 @@ namespace Edo
             {
                 Marshal.StructureToPtr(test, address, false);
 
-                MockClass result = Proc.ReadMemory<MockClass>(address);
+                MockClass result = Proc.Read<MockClass>(address);
                 Assert.AreEqual(test.value1, result.value1);
                 Assert.AreEqual(test.value2, result.value2);
                 Assert.AreEqual(test.value3, result.value3);
@@ -194,21 +194,21 @@ namespace Edo
         public void TestReadThrowsOnNull()
         {
             byte[] buffer = null;
-            Proc.ReadMemory(IntPtr.Zero, buffer, 4);
+            Proc.Read(IntPtr.Zero, buffer, 4);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestReadThrowsIfBufferNotLargeEnough()
         {
-            Proc.ReadMemory(IntPtr.Zero, OutStream.GetBuffer(), 10000);
+            Proc.Read(IntPtr.Zero, OutStream.GetBuffer(), 10000);
         }
 
         [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
         public void TestReadThrowsOnApiError()
         {
-            Proc.ReadMemory(IntPtr.Zero, OutStream.GetBuffer(), 4);
+            Proc.Read(IntPtr.Zero, OutStream.GetBuffer(), 4);
         }
 
         [TestMethod]
@@ -216,14 +216,14 @@ namespace Edo
         public void TestReadWithStreamThrowsOnNull()
         {
             Stream stream = null;
-            Proc.ReadMemory(IntPtr.Zero, stream, 4);
+            Proc.Read(IntPtr.Zero, stream, 4);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestReadTArrayThrowsOnZeroNegativeElementCount()
         {
-            Proc.ReadMemory<Int32>(IntPtr.Zero, 0);
+            Proc.Read<Int32>(IntPtr.Zero, 0);
         }
 
         [TestMethod]
@@ -235,7 +235,7 @@ namespace Edo
             int result = 0;
             IntPtr address = (IntPtr)(&result);
 
-            Proc.WriteMemory(address, OutStream.GetBuffer(), 4);
+            Proc.Write(address, OutStream.GetBuffer(), 4);
             Assert.AreEqual(number, result);
         }
 
@@ -249,7 +249,7 @@ namespace Edo
             IntPtr address = (IntPtr)(&result);
 
             OutStream.Seek(0, SeekOrigin.Begin);
-            Proc.WriteMemory(address, OutStream, 4);
+            Proc.Write(address, OutStream, 4);
             Assert.AreEqual(number, result);
         }
 
@@ -259,7 +259,7 @@ namespace Edo
             Boolean result = true;
             IntPtr address = (IntPtr)(&result);
 
-            Proc.WriteMemory(address, false);
+            Proc.Write(address, false);
             Assert.IsFalse(result);
         }
 
@@ -269,7 +269,7 @@ namespace Edo
             Boolean result = false;
             IntPtr address = (IntPtr)(&result);
 
-            Proc.WriteMemory(address, true);
+            Proc.Write(address, true);
             Assert.IsTrue(result);
         }
 
@@ -281,7 +281,7 @@ namespace Edo
             Int32 result = 0;
             IntPtr address = (IntPtr)(&result);
 
-            Proc.WriteMemory(address, number);
+            Proc.Write(address, number);
             Assert.AreEqual(number, result);
         }
 
@@ -293,7 +293,7 @@ namespace Edo
             Int64 result = 0;
             IntPtr address = (IntPtr)(&result);
 
-            Proc.WriteMemory(address, number);
+            Proc.Write(address, number);
             Assert.AreEqual(number, result);
         }
 
@@ -305,7 +305,7 @@ namespace Edo
             Single result = 0;
             IntPtr address = (IntPtr)(&result);
 
-            Proc.WriteMemory(address, number);
+            Proc.Write(address, number);
             Assert.AreEqual(number, result);
         }
 
@@ -317,7 +317,7 @@ namespace Edo
             Double result = 0;
             IntPtr address = (IntPtr)(&result);
 
-            Proc.WriteMemory(address, number);
+            Proc.Write(address, number);
             Assert.AreEqual(number, result);
         }
 
@@ -328,7 +328,7 @@ namespace Edo
             IntPtr address = (IntPtr)(&number);
             IntPtr addressPtr = (IntPtr)(&address);
 
-            Proc.WriteMemory(addressPtr, number);
+            Proc.Write(addressPtr, number);
             Assert.AreEqual(number, address);
         }
 
@@ -343,7 +343,7 @@ namespace Edo
             MockVector result = new MockVector();
             IntPtr address = (IntPtr)(&result);
 
-            Proc.WriteMemory(address, vector);
+            Proc.Write(address, vector);
             Assert.AreEqual(vector.X, result.X);
             Assert.AreEqual(vector.Y, result.Y);
             Assert.AreEqual(vector.Z, result.Z);
@@ -363,7 +363,7 @@ namespace Edo
             IntPtr address = Marshal.AllocHGlobal(size);
             try
             {
-                Proc.WriteMemory(address, test);
+                Proc.Write(address, test);
                 MockClass result = Marshal.PtrToStructure<MockClass>(address);
 
                 Assert.AreEqual(test.value1, result.value1);
@@ -383,21 +383,21 @@ namespace Edo
         public void TestWriteThrowsOnNull()
         {
             byte[] buffer = null;
-            Proc.WriteMemory(IntPtr.Zero, buffer, 4);
+            Proc.Write(IntPtr.Zero, buffer, 4);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestWriteThrowsIfBufferNotLargeEnough()
         {
-            Proc.WriteMemory(IntPtr.Zero, new byte[4], 5);
+            Proc.Write(IntPtr.Zero, new byte[4], 5);
         }
 
         [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
         public void TestWriteThrowsOnApiError()
         {
-            Proc.ReadMemory(IntPtr.Zero, OutStream.GetBuffer(), 4);
+            Proc.Read(IntPtr.Zero, OutStream.GetBuffer(), 4);
         }
 
         [TestMethod]
@@ -405,7 +405,7 @@ namespace Edo
         public void TestWriteWithStreamThrowsOnNull()
         {
             Stream stream = null;
-            Proc.WriteMemory(IntPtr.Zero, stream, 4);
+            Proc.Write(IntPtr.Zero, stream, 4);
         }
 
         [TestMethod]
@@ -413,7 +413,7 @@ namespace Edo
         public void TestWriteTThrowsOnNull()
         {
             MockClass value = null;
-            Proc.WriteMemory<MockClass>(IntPtr.Zero, value);
+            Proc.Write<MockClass>(IntPtr.Zero, value);
         }
 
         [TestMethod]
@@ -421,14 +421,14 @@ namespace Edo
         public void TestWriteTArrayThrowsOnNullArray()
         {
             Int32[] values = null;
-            Proc.WriteMemory(IntPtr.Zero, values);
+            Proc.Write(IntPtr.Zero, values);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestWriteTArrayThrowsOnZeroArray()
         {
-            Proc.WriteMemory<Int32>(IntPtr.Zero, new Int32[0]);
+            Proc.Write<Int32>(IntPtr.Zero, new Int32[0]);
         }
 
         [TestMethod]
@@ -444,8 +444,8 @@ namespace Edo
             IntPtr address = Marshal.AllocHGlobal(numbers.Length * Marshal.SizeOf<Int32>());
             try
             {
-                Proc.WriteMemory(address, numbers);
-                Int32[] results = Proc.ReadMemory<Int32>(address, 3);
+                Proc.Write(address, numbers);
+                Int32[] results = Proc.Read<Int32>(address, 3);
 
                 Assert.AreEqual(numbers.Length, results.Length);
                 Assert.AreEqual(numbers[0], results[0]);
@@ -471,8 +471,8 @@ namespace Edo
             IntPtr address = Marshal.AllocHGlobal(vectors.Length * Marshal.SizeOf<MockVector>());
             try
             {
-                Proc.WriteMemory(address, vectors);
-                MockVector[] results = Proc.ReadMemory<MockVector>(address, 3);
+                Proc.Write(address, vectors);
+                MockVector[] results = Proc.Read<MockVector>(address, 3);
 
                 Assert.AreEqual(vectors.Length, results.Length);
                 for (int i = 0; i < vectors.Length; i++)
@@ -501,8 +501,8 @@ namespace Edo
             IntPtr address = Marshal.AllocHGlobal(classes.Length * Marshal.SizeOf<MockClass>());
             try
             {
-                Proc.WriteMemory(address, classes);
-                MockClass[] results = Proc.ReadMemory<MockClass>(address, 3);
+                Proc.Write(address, classes);
+                MockClass[] results = Proc.Read<MockClass>(address, 3);
 
                 Assert.AreEqual(classes.Length, results.Length);
                 for (int i = 0; i < classes.Length; i++)
