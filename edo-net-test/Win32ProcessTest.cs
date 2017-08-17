@@ -6,14 +6,14 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Edo.Mock;
-using Edo.Windows;
+using Edo.Win32;
 
 namespace Edo
 {
     [TestClass]
-    public class ProcessTest
+    public class Win32ProcessTest
     {
-        public ProcessTest()
+        public Win32ProcessTest()
         {
             Proc = null;
             OutStream = new MemoryStream(32);
@@ -25,7 +25,7 @@ namespace Edo
         public void Init()
         {
             Id = System.Diagnostics.Process.GetCurrentProcess().Id;
-            Proc = Process.Open(Id, ProcessAccessRights.AllAccess);
+            Proc = Win32Process.Open(Id, ProcessAccessRights.AllAccess);
             OutStream.Seek(0, SeekOrigin.Begin);
             OutStream.SetLength(0);
         }
@@ -33,7 +33,7 @@ namespace Edo
         [TestMethod]
         public void TestOpenHandle()
         {
-            var handle = Process.OpenHandle(Id, ProcessAccessRights.AllAccess);
+            var handle = Win32Process.OpenHandle(Id, ProcessAccessRights.AllAccess);
             handle.Dispose();
         }
 
@@ -41,14 +41,14 @@ namespace Edo
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenHandleThrowsOnApiError()
         {
-            Process.OpenHandle(0, ProcessAccessRights.AllAccess);
+            Win32Process.OpenHandle(0, ProcessAccessRights.AllAccess);
         }
 
         [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenThrowsOnApiError()
         {
-            Process.Open(0, ProcessAccessRights.AllAccess);
+            Win32Process.Open(0, ProcessAccessRights.AllAccess);
         }
 
         [TestMethod]
@@ -523,7 +523,7 @@ namespace Edo
         [TestMethod]
         public void TestModules()
         {
-            var modules = System.Diagnostics.Process.GetCurrentProcess().Modules;
+            var modules = Process.GetCurrentProcess().Modules;
             var results = Proc.Modules;
 
             Assert.AreEqual(modules.Count, results.Count);
@@ -536,8 +536,8 @@ namespace Edo
             }
         }
 
-        public Int32 Id { get; set; }
-        public Process Proc { get; set; }
+        public Int32 Id { get; set; } 
+        public Win32Process Proc { get; set; }
         public MemoryStream OutStream { get; set; }
         public BinaryReader Reader { get; set; }
         public BinaryWriter Writer { get; set; }

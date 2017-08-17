@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Edo.Win32.Model;
 
-namespace Edo.Windows
+namespace Edo.Win32
 {
     /// <summary>
     /// Wraps functions imported from the windows api

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Edo.Windows
+namespace Edo.Win32
 {
     /// <summary>
     /// An enumeration of all available Toolhelp32 snapshot flags in the windows api

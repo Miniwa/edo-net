@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Edo.Windows
+namespace Edo.Win32
 {
     /// <summary>
     /// An enumeration of available process flags available in the windows api

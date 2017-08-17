@@ -1,4 +1,4 @@
-﻿namespace Edo.Windows
+﻿namespace Edo.Win32
 {
     /// <summary>
     /// An enumeration of windows api error codes

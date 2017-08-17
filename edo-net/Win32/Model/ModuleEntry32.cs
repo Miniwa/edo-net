@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Edo.Windows
+namespace Edo.Win32.Model
 {
     /// <summary>
     /// Represents the windows api structure MODULEENTRY32

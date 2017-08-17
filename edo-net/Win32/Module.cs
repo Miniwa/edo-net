@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Edo
+namespace Edo.Win32
 {
     /// <summary>
     /// Provides information about a single module within a process

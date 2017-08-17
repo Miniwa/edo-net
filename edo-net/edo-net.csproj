@@ -42,17 +42,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntPtrExtension.cs" />
-    <Compile Include="Module.cs" />
-    <Compile Include="Windows\Constants.cs" />
-    <Compile Include="Windows\ErrorCodes.cs" />
-    <Compile Include="Windows\ModuleEntry32.cs" />
-    <Compile Include="Windows\ProcessAccessRights.cs" />
+    <Compile Include="Win32\Module.cs" />
+    <Compile Include="Win32\Constants.cs" />
+    <Compile Include="Win32\ErrorCodes.cs" />
+    <Compile Include="Win32\Model\ModuleEntry32.cs" />
+    <Compile Include="Win32\ProcessAccessRights.cs" />
     <Compile Include="Seriz.cs" />
-    <Compile Include="Windows\SnapshotFlags.cs" />
-    <Compile Include="Windows\StandardAccessRights.cs" />
-    <Compile Include="Process.cs" />
+    <Compile Include="Win32\SnapshotFlags.cs" />
+    <Compile Include="Win32\StandardAccessRights.cs" />
+    <Compile Include="Win32\Win32Process.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Windows\Api.cs" />
+    <Compile Include="Win32\Api.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

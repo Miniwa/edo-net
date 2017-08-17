@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
-using Edo.Windows;
+using Edo.Win32.Model;
 using Microsoft.Win32.SafeHandles;
 
-namespace Edo
+namespace Edo.Win32
 {
     /// <summary>
     /// Provides a managed low level interface to a process
     /// </summary>
-    public class Process
+    public class Win32Process
     {
         /// <summary>
         /// Opens a handle with given access rights to a process with given process id
@@ -36,16 +36,16 @@ namespace Edo
         /// <param name="desiredAccess">The desired access rights to the process</param>
         /// <returns>The newly opened process</returns>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public static Process Open(Int32 id, ProcessAccessRights desiredAccess)
+        public static Win32Process Open(Int32 id, ProcessAccessRights desiredAccess)
         {
-            return new Process(OpenHandle(id, desiredAccess));
+            return new Win32Process(OpenHandle(id, desiredAccess));
         }
 
         /// <summary>
         /// Creates the process with given handle
         /// </summary>
         /// <param name="handle">A handle to the process to be targeted</param>
-        public Process(SafeProcessHandle handle)
+        public Win32Process(SafeProcessHandle handle)
         {
             Handle = handle;
             Id = 0;
