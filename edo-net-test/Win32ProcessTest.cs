@@ -52,6 +52,13 @@ namespace Edo
         }
 
         [TestMethod]
+        public void TestId()
+        {
+            int id = Process.GetCurrentProcess().Id;
+            Assert.AreEqual(id, Proc.Id);
+        }
+
+        [TestMethod]
         public unsafe void TestRead()
         {
             int number = 30;

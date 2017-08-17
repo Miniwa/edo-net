@@ -24,6 +24,9 @@ namespace Edo.Win32
             [In] UIntPtr nrBytesToWrite, [Out] out UIntPtr nrBytesWritten);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern UInt32 GetProcessId([In] IntPtr handle);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr CreateToolhelp32Snapshot([In] SnapshotFlags flags, [In] UInt32 processId);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]

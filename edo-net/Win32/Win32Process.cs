@@ -48,7 +48,6 @@ namespace Edo.Win32
         public Win32Process(SafeProcessHandle handle)
         {
             Handle = handle;
-            Id = 0;
             Buffer = new byte[16];
         }
 
@@ -250,7 +249,10 @@ namespace Edo.Win32
         /// <summary>
         /// The id of the process
         /// </summary>
-        public UInt32 Id { get; private set; }
+        public Int32 Id
+        {
+            get { return Convert.ToInt32(Api.GetProcessId(Handle.DangerousGetHandle())); }
+        }
 
         /// <summary>
         /// The collection of modules that are loaded into this process
@@ -259,7 +261,7 @@ namespace Edo.Win32
         {
             get
             {
-                IntPtr snapshot = Api.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, Id);
+                IntPtr snapshot = Api.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, Convert.ToUInt32(Id));
                 if(snapshot.IsInvalidHandle())
                     throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create module snapshot");
 
