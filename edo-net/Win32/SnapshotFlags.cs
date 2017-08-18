@@ -18,11 +18,10 @@ namespace Edo.Win32
         /// </summary>
         HeapList = 0x1,
 
-
         /// <summary>
         /// Represents TH32CS_SNAPMODULE (0x00000008)
         /// </summary>
-        Module = 0x00000008,
+        Module = 0x8,
 
         /// <summary>
         /// Represents TH32CS_SNAPMODULE32 0x00000010

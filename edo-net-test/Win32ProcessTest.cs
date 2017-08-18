@@ -25,7 +25,7 @@ namespace Edo
         public void Init()
         {
             Id = System.Diagnostics.Process.GetCurrentProcess().Id;
-            Proc = Win32Process.Open(Id, ProcessAccess.AllAccess);
+            Proc = Win32Process.Open(Id, ProcessRights.AllAccess);
             OutStream.Seek(0, SeekOrigin.Begin);
             OutStream.SetLength(0);
         }
@@ -33,7 +33,7 @@ namespace Edo
         [TestMethod]
         public void TestOpenHandle()
         {
-            var handle = Win32Process.OpenHandle(Id, ProcessAccess.AllAccess);
+            var handle = Win32Process.OpenHandle(Id, ProcessRights.AllAccess);
             handle.Dispose();
         }
 
@@ -41,14 +41,14 @@ namespace Edo
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenHandleThrowsOnApiError()
         {
-            Win32Process.OpenHandle(0, ProcessAccess.AllAccess);
+            Win32Process.OpenHandle(0, ProcessRights.AllAccess);
         }
 
         [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenThrowsOnApiError()
         {
-            Win32Process.Open(0, ProcessAccess.AllAccess);
+            Win32Process.Open(0, ProcessRights.AllAccess);
         }
 
         [TestMethod]
@@ -557,6 +557,34 @@ namespace Edo
             {
                 Marshal.FreeHGlobal(address);
             }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestAllocThrowsOnZeroCount()
+        {
+            Proc.Alloc(0);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Win32Exception))]
+        public void TestAllocThrowsOnApiError()
+        {
+            Proc.Alloc(int.MaxValue);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Win32Exception))]
+        public void TestFreeThrowsOnApiError()
+        {
+            Proc.Free(IntPtr.Zero);
+        }
+
+        [TestMethod]
+        public void TestAllocFree()
+        {
+            IntPtr address = Proc.Alloc(1024);
+            Proc.Free(address);
         }
 
         public Int32 Id { get; set; } 

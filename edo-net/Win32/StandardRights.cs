@@ -6,7 +6,7 @@ namespace Edo.Win32
     /// An enumeration of standard access flags within the windows api
     /// </summary>
     [Flags]
-    public enum StandardAccess : UInt32
+    public enum StandardRights : UInt32
     {
         /// <summary>
         /// Represents DELETE (0x00010000L)

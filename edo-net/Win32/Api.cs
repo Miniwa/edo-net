@@ -11,7 +11,7 @@ namespace Edo.Win32
     public static class Api
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern IntPtr OpenProcess([In] ProcessAccess desiredAccess, [In] Boolean inheritHandle, [In] UInt32 processId);
+        public static extern IntPtr OpenProcess([In] ProcessRights desiredRights, [In] Boolean inheritHandle, [In] UInt32 processId);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean CloseHandle([In] IntPtr handle);
@@ -23,6 +23,14 @@ namespace Edo.Win32
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean WriteProcessMemory([In] IntPtr processHandle, [In] IntPtr address, [Out] byte[] buffer,
             [In] UIntPtr nrBytesToWrite, [Out] out UIntPtr nrBytesWritten);
+
+       [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern IntPtr VirtualAllocEx([In] IntPtr processHandle, [In] IntPtr address, [In] UIntPtr size,
+            [In] AllocationOptions allocationType, [In] ProtectionOptions protectionOptions);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Boolean VirtualFreeEx([In] IntPtr processHandle, [In] IntPtr address, [In] UIntPtr size,
+            [In] FreeOptions freeType);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern UInt32 GetProcessId([In] IntPtr handle);

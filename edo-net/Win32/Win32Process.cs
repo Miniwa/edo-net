@@ -19,12 +19,12 @@ namespace Edo.Win32
         /// Opens a handle with given access rights to a process with given process id
         /// </summary>
         /// <param name="id">The id of the process to be opened</param>
-        /// <param name="desiredAccess">The desired access rights to the process</param>
+        /// <param name="desiredRights">The desired access rights to the process</param>
         /// <returns>The new handle to the process</returns>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public static SafeProcessHandle OpenHandle(Int32 id, ProcessAccess desiredAccess)
+        public static SafeProcessHandle OpenHandle(Int32 id, ProcessRights desiredRights)
         {
-            IntPtr handle = Api.OpenProcess(desiredAccess, false, Convert.ToUInt32(id));
+            IntPtr handle = Api.OpenProcess(desiredRights, false, Convert.ToUInt32(id));
             if (handle.IsNullPtr())
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not open handle to process");
 
@@ -35,12 +35,12 @@ namespace Edo.Win32
         /// Opens a process with given process id
         /// </summary>
         /// <param name="id">The id of the process to be opened</param>
-        /// <param name="desiredAccess">The desired access rights to the process</param>
+        /// <param name="desiredRights">The desired access rights to the process</param>
         /// <returns>The newly opened process</returns>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public static Win32Process Open(Int32 id, ProcessAccess desiredAccess)
+        public static Win32Process Open(Int32 id, ProcessRights desiredRights)
         {
-            return new Win32Process(OpenHandle(id, desiredAccess));
+            return new Win32Process(OpenHandle(id, desiredRights));
         }
 
         /// <summary>
@@ -244,6 +244,51 @@ namespace Edo.Win32
         }
 
         /// <summary>
+        /// Allocates a block of given size and given protection options inside virtual memory of the process using given allocation options
+        /// </summary>
+        /// <param name="count">The amount of bytes to be allocated</param>
+        /// <param name="allocationType">The allocation options to be used when allocating</param>
+        /// <param name="protectionOptions">The protection options of the allocated block</param>
+        /// <returns>The starting address of the newly allocated block</returns>
+        /// <exception cref="ArgumentException">If count is equal to or less than zero</exception>
+        public IntPtr Alloc(int count, AllocationOptions allocationType, ProtectionOptions protectionOptions)
+        {
+            if(count <= 0)
+                throw new ArgumentException("Count must be greater than zero");
+
+            IntPtr address = Api.VirtualAllocEx(Handle.DangerousGetHandle(), IntPtr.Zero,
+                new UIntPtr(Convert.ToUInt32(count)), allocationType, protectionOptions);
+            if(address.IsNullPtr())
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not allocate memory within process");
+
+            return address;
+        }
+
+        /// <summary>
+        /// Allocates a block of given size inside virtual memory of the process
+        /// </summary>
+        /// <param name="count">The amount of bytes to be allocated</param>
+        /// <returns>The starting address of the newly allocated block</returns>
+        /// <exception cref="ArgumentException">If count is equal to or less than zero</exception>
+        public IntPtr Alloc(int count)
+        {
+            if (count <= 0)
+                throw new ArgumentException("Count must be greater than zero");
+
+            return Alloc(count, AllocationOptions.Commit, ProtectionOptions.ExecuteReadWrite);
+        }
+
+        /// <summary>
+        /// Frees a previously allocated block of memory inside virtual memory of the process
+        /// </summary>
+        /// <param name="address">The starting address of the block to be freed</param>
+        public void Free(IntPtr address)
+        {
+            if(!Api.VirtualFreeEx(Handle.DangerousGetHandle(), address, UIntPtr.Zero, FreeOptions.Release))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not free memory in process");
+        }
+
+        /// <summary>
         /// The active handle to the process
         /// </summary>
         public SafeProcessHandle Handle { get; private set; }
@@ -312,7 +357,7 @@ namespace Edo.Win32
                     while (Api.Module32Next(snapshot, ref moduleEntry));
 
                     int code = Marshal.GetLastWin32Error();
-                    if(code != (int)ErrorCodes.NoMoreFiles)
+                    if(code != (int)ErrorCode.NoMoreFiles)
                         throw new Win32Exception(code, "Could not load the next module from the snapshot");
 
                     return modules;

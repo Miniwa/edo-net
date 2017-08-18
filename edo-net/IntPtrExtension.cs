@@ -25,7 +25,7 @@ namespace Edo
         /// <returns></returns>
         public static Boolean IsInvalidHandle(this IntPtr ptr)
         {
-            return ptr.ToInt32() == Constants.InvalidHandleValue;
+            return ptr.ToInt32() == Constant.InvalidHandleValue;
         }
     }
 }

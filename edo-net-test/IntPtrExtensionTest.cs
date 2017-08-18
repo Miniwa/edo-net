@@ -12,7 +12,7 @@ namespace Edo
         {
             Ptr = new IntPtr(8000);
             NullPtr = new IntPtr(0);
-            InvalidPtr = new IntPtr(Constants.InvalidHandleValue);
+            InvalidPtr = new IntPtr(Constant.InvalidHandleValue);
         }
 
         [TestMethod]
