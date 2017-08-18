@@ -6,7 +6,7 @@ namespace Edo.Win32
     /// An enumeration of available process flags available in the windows api
     /// </summary>
     [Flags]
-    public enum ProcessAccessRights : UInt32
+    public enum ProcessAccess : UInt32
     {
         /// <summary>
         /// Represents PROCESS_CREATE_PROCESS (0x0080)
@@ -78,7 +78,7 @@ namespace Edo.Win32
         /// </summary>
         AllAccess = CreateProcess | CreateThread | DuplicateHandle | QueryInformation | QueryLimitedInformation
             | SetInformation | SetQuota | SuspendResume | Terminate | VmOperation | VmRead | VmWrite | Synchronize
-            | StandardAccessRights.Synchronize | StandardAccessRights.Delete | StandardAccessRights.ReadControl
-            | StandardAccessRights.WriteDac | StandardAccessRights.WriteOwner
+            | StandardAccess.Synchronize | StandardAccess.Delete | StandardAccess.ReadControl
+            | StandardAccess.WriteDac | StandardAccess.WriteOwner
     }
 }

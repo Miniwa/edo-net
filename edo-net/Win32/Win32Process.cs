@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using Edo.Win32.Model;
 using Microsoft.Win32.SafeHandles;
 
@@ -20,7 +22,7 @@ namespace Edo.Win32
         /// <param name="desiredAccess">The desired access rights to the process</param>
         /// <returns>The new handle to the process</returns>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public static SafeProcessHandle OpenHandle(Int32 id, ProcessAccessRights desiredAccess)
+        public static SafeProcessHandle OpenHandle(Int32 id, ProcessAccess desiredAccess)
         {
             IntPtr handle = Api.OpenProcess(desiredAccess, false, Convert.ToUInt32(id));
             if (handle.IsNullPtr())
@@ -36,7 +38,7 @@ namespace Edo.Win32
         /// <param name="desiredAccess">The desired access rights to the process</param>
         /// <returns>The newly opened process</returns>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public static Win32Process Open(Int32 id, ProcessAccessRights desiredAccess)
+        public static Win32Process Open(Int32 id, ProcessAccess desiredAccess)
         {
             return new Win32Process(OpenHandle(id, desiredAccess));
         }
@@ -255,6 +257,30 @@ namespace Edo.Win32
         }
 
         /// <summary>
+        /// The full path of the file used to start the process
+        /// </summary>
+        public string FullPath
+        {
+            get
+            {
+                uint capacity = 1024;
+                StringBuilder builder = new StringBuilder(Convert.ToInt32(capacity));
+                if(!Api.QueryFullProcessImageName(Handle.DangerousGetHandle(), 0, builder, ref capacity))
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not retrieve process filename");
+
+                return builder.ToString(0, Convert.ToInt32(capacity));
+            }
+        }
+
+        /// <summary>
+        /// The filename of the file used to start the process
+        /// </summary>
+        public string FileName
+        {
+            get { return Path.GetFileName(FullPath); }
+        }
+
+        /// <summary>
         /// The collection of modules that are loaded into this process
         /// </summary>
         public ICollection<Module> Modules
@@ -297,6 +323,14 @@ namespace Edo.Win32
                         throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not close snapshot handle");
                 }
             }
+        }
+
+        /// <summary>
+        /// The main module of the process
+        /// </summary>
+        public Module MainModule
+        {
+            get { return Modules.Single(module => module.FileName == FileName); }
         }
 
         /// <summary>

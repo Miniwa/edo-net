@@ -25,7 +25,7 @@ namespace Edo
         public void Init()
         {
             Id = System.Diagnostics.Process.GetCurrentProcess().Id;
-            Proc = Win32Process.Open(Id, ProcessAccessRights.AllAccess);
+            Proc = Win32Process.Open(Id, ProcessAccess.AllAccess);
             OutStream.Seek(0, SeekOrigin.Begin);
             OutStream.SetLength(0);
         }
@@ -33,7 +33,7 @@ namespace Edo
         [TestMethod]
         public void TestOpenHandle()
         {
-            var handle = Win32Process.OpenHandle(Id, ProcessAccessRights.AllAccess);
+            var handle = Win32Process.OpenHandle(Id, ProcessAccess.AllAccess);
             handle.Dispose();
         }
 
@@ -41,14 +41,14 @@ namespace Edo
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenHandleThrowsOnApiError()
         {
-            Win32Process.OpenHandle(0, ProcessAccessRights.AllAccess);
+            Win32Process.OpenHandle(0, ProcessAccess.AllAccess);
         }
 
         [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenThrowsOnApiError()
         {
-            Win32Process.Open(0, ProcessAccessRights.AllAccess);
+            Win32Process.Open(0, ProcessAccess.AllAccess);
         }
 
         [TestMethod]
@@ -56,6 +56,38 @@ namespace Edo
         {
             int id = Process.GetCurrentProcess().Id;
             Assert.AreEqual(id, Proc.Id);
+        }
+
+        [TestMethod]
+        public void TestFileName()
+        {
+            string name = Process.GetCurrentProcess().ProcessName + ".exe";
+            Assert.AreEqual(name, Proc.FileName);
+        }
+
+        [TestMethod]
+        public void TestModules()
+        {
+            var modules = Process.GetCurrentProcess().Modules;
+            var results = Proc.Modules;
+
+            Assert.AreEqual(modules.Count, results.Count);
+            foreach (ProcessModule module in modules)
+            {
+                var match = results.Single(mod => module.FileName == mod.FullPath);
+                Assert.AreEqual(module.ModuleName, match.FileName);
+                Assert.AreEqual(module.BaseAddress, match.BaseAddress);
+                Assert.AreEqual(module.ModuleMemorySize, match.BaseSize);
+            }
+        }
+
+        [TestMethod]
+        public void TestMainModule()
+        {
+            Module main = Proc.MainModule;
+            var actual = Process.GetCurrentProcess().MainModule;
+
+            Assert.AreEqual(actual.BaseAddress, main.BaseAddress);
         }
 
         [TestMethod]
@@ -524,22 +556,6 @@ namespace Edo
             finally
             {
                 Marshal.FreeHGlobal(address);
-            }
-        }
-
-        [TestMethod]
-        public void TestModules()
-        {
-            var modules = Process.GetCurrentProcess().Modules;
-            var results = Proc.Modules;
-
-            Assert.AreEqual(modules.Count, results.Count);
-            foreach (ProcessModule module in modules)
-            {
-                var match = results.Single(mod => module.FileName == mod.FullPath);
-                Assert.AreEqual(module.ModuleName, match.FileName);
-                Assert.AreEqual(module.BaseAddress, match.BaseAddress);
-                Assert.AreEqual(module.ModuleMemorySize, match.BaseSize);
             }
         }
 

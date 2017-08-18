@@ -46,10 +46,10 @@
     <Compile Include="Win32\Constants.cs" />
     <Compile Include="Win32\ErrorCodes.cs" />
     <Compile Include="Win32\Model\ModuleEntry32.cs" />
-    <Compile Include="Win32\ProcessAccessRights.cs" />
+    <Compile Include="Win32\ProcessAccess.cs" />
     <Compile Include="Seriz.cs" />
     <Compile Include="Win32\SnapshotFlags.cs" />
-    <Compile Include="Win32\StandardAccessRights.cs" />
+    <Compile Include="Win32\StandardAccess.cs" />
     <Compile Include="Win32\Win32Process.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32\Api.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using Edo.Win32.Model;
 
 namespace Edo.Win32
@@ -10,7 +11,7 @@ namespace Edo.Win32
     public static class Api
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern IntPtr OpenProcess([In] ProcessAccessRights desiredAccess, [In] Boolean inheritHandle, [In] UInt32 processId);
+        public static extern IntPtr OpenProcess([In] ProcessAccess desiredAccess, [In] Boolean inheritHandle, [In] UInt32 processId);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean CloseHandle([In] IntPtr handle);
@@ -25,6 +26,10 @@ namespace Edo.Win32
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern UInt32 GetProcessId([In] IntPtr handle);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Boolean QueryFullProcessImageName([In] IntPtr processHandle, [In] UInt32 flags,
+            [Out] StringBuilder path, ref UInt32 size);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr CreateToolhelp32Snapshot([In] SnapshotFlags flags, [In] UInt32 processId);
