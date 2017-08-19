@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -41,6 +42,63 @@ namespace Edo.Win32
         public static Win32Process Open(Int32 id, ProcessRights desiredRights)
         {
             return new Win32Process(OpenHandle(id, desiredRights));
+        }
+
+        /// <summary>
+        /// Returns a collection of processes that owns open handles to the process with given process id
+        /// </summary>
+        /// <param name="processId">The id of the process whose handles should be located</param>
+        /// <param name="minimumRights">The minumum process rights the handle needs to have for it to be included</param>
+        /// <returns>The collection of processes with open handles to given process</returns>
+        public static ICollection<HandlePair> GetHandles(Int32 processId, ProcessRights minimumRights)
+        {
+            if(processId <= 0)
+                throw new ArgumentException("Process id must be larger than zero");
+
+            byte[] buffer;
+            NtStatus status;
+            int size = 1024;
+            uint actualSize = 0;
+            do
+            {
+                buffer = new byte[size];
+                status = Api.NtQuerySystemInformation(SystemInformationType.HandleInformation, buffer,
+                    Convert.ToUInt32(size), ref actualSize);
+                if(status != NtStatus.Success && status != NtStatus.BufferTooSmall && status != NtStatus.InfoLengthMismatch)
+                    throw new Win32Exception("Could not retrieve system handle information");
+
+                size = Convert.ToInt32(actualSize);
+            }
+            while (status != NtStatus.Success);
+
+            int count = Seriz.Parse<int>(buffer);
+            SystemHandle[] systemHandles = Seriz.Parse<SystemHandle>(buffer.Skip(4).ToArray(), count);
+            List<HandlePair> results = new List<HandlePair>();
+            foreach (var handle in systemHandles)
+            {
+                if ((minimumRights & handle.Rights) == minimumRights)
+                {
+                    try
+                    {
+                        Win32Process process = Open(Convert.ToInt32(handle.ProcessId), ProcessRights.DuplicateHandle);
+
+                        IntPtr sourceHandle = new IntPtr(handle.Handle);
+                        IntPtr targetHandle = IntPtr.Zero;
+                        if (!Api.DuplicateHandle(process.Handle.DangerousGetHandle(), sourceHandle, new IntPtr(-1), ref targetHandle,
+                                ProcessRights.QueryInformation, false, DuplicationOptions.None))
+                            throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not duplicate handle");
+
+                        if(Convert.ToInt32(Api.GetProcessId(targetHandle)) == processId)
+                            results.Add(new HandlePair(process, sourceHandle));
+                    }
+                    catch (Win32Exception)
+                    {
+                        // Ignore
+                    }
+                }
+            }
+
+            return results;
         }
 
         /// <summary>

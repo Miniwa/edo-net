@@ -9,6 +9,11 @@ namespace Edo.Win32
     public enum ProcessRights : UInt32
     {
         /// <summary>
+        /// Represents no access rights what so ever
+        /// </summary>
+        None = 0,
+
+        /// <summary>
         /// Represents PROCESS_CREATE_PROCESS (0x0080)
         /// </summary>
         CreateProcess = 0x80,

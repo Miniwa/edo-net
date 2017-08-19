@@ -6,6 +6,11 @@
     public enum ErrorCode
     {
         /// <summary>
+        /// Represents ERROR_ACCESS_DENIED
+        /// </summary>
+        AccessDenied = 5,
+
+        /// <summary>
         /// Represents ERROR_NO_MORE_FILES
         /// </summary>
         NoMoreFiles = 18,

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using Edo.Win32.Model;
@@ -10,8 +11,14 @@ namespace Edo.Win32
     /// </summary>
     public static class Api
     {
+        // Kernel32
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr OpenProcess([In] ProcessRights desiredRights, [In] Boolean inheritHandle, [In] UInt32 processId);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Boolean DuplicateHandle([In] IntPtr sourceProcessHandle, [In] IntPtr sourceHandle,
+            [In] IntPtr targetProcessHandle, ref IntPtr targetHandle, [In] ProcessRights desiredProcessRights,
+            [In] Boolean inherit, [In] DuplicationOptions duplicationOptions);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean CloseHandle([In] IntPtr handle);
@@ -47,5 +54,10 @@ namespace Edo.Win32
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean Module32Next([In] IntPtr snapshot, ref ModuleEntry32 moduleEntry);
+
+        //Ntdll
+        [DllImport("ntdll.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern NtStatus NtQuerySystemInformation([In] SystemInformationType infoType, byte[] buffer,
+            [In] UInt32 size, ref UInt32 actualSize);
     }
 }

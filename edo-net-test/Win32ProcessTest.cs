@@ -24,7 +24,7 @@ namespace Edo
         [TestInitialize]
         public void Init()
         {
-            Id = System.Diagnostics.Process.GetCurrentProcess().Id;
+            Id = Process.GetCurrentProcess().Id;
             Proc = Win32Process.Open(Id, ProcessRights.AllAccess);
             OutStream.Seek(0, SeekOrigin.Begin);
             OutStream.SetLength(0);
@@ -49,6 +49,13 @@ namespace Edo
         public void TestOpenThrowsOnApiError()
         {
             Win32Process.Open(0, ProcessRights.AllAccess);
+        }
+
+        [TestMethod]
+        public void TestGetHandles()
+        {
+            var handles = Win32Process.GetHandles(Id, ProcessRights.AllAccess);
+            Assert.AreEqual(10, handles.Count);
         }
 
         [TestMethod]

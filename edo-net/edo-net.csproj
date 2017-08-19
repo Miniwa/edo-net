@@ -43,16 +43,21 @@
   <ItemGroup>
     <Compile Include="IntPtrExtension.cs" />
     <Compile Include="Win32\AllocationOptions.cs" />
+    <Compile Include="Win32\DuplicationOptions.cs" />
     <Compile Include="Win32\FreeOptions.cs" />
+    <Compile Include="Win32\HandlePair.cs" />
+    <Compile Include="Win32\Model\SystemHandle.cs" />
     <Compile Include="Win32\Module.cs" />
     <Compile Include="Win32\Constant.cs" />
     <Compile Include="Win32\ErrorCode.cs" />
     <Compile Include="Win32\Model\ModuleEntry32.cs" />
+    <Compile Include="Win32\NtStatus.cs" />
     <Compile Include="Win32\ProcessRights.cs" />
     <Compile Include="Seriz.cs" />
     <Compile Include="Win32\ProtectionOptions.cs" />
     <Compile Include="Win32\SnapshotFlags.cs" />
     <Compile Include="Win32\StandardRights.cs" />
+    <Compile Include="Win32\SystemInformationType.cs" />
     <Compile Include="Win32\Win32Process.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32\Api.cs" />
