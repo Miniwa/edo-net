@@ -45,8 +45,8 @@
     <Compile Include="Win32\AllocationOptions.cs" />
     <Compile Include="Win32\DuplicationOptions.cs" />
     <Compile Include="Win32\FreeOptions.cs" />
-    <Compile Include="Win32\HandlePair.cs" />
-    <Compile Include="Win32\Model\SystemHandle.cs" />
+    <Compile Include="Win32\SystemHandle.cs" />
+    <Compile Include="Win32\Model\SystemHandle32.cs" />
     <Compile Include="Win32\Module.cs" />
     <Compile Include="Win32\Constant.cs" />
     <Compile Include="Win32\ErrorCode.cs" />

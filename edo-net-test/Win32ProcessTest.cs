@@ -24,8 +24,8 @@ namespace Edo
         [TestInitialize]
         public void Init()
         {
-            Id = Process.GetCurrentProcess().Id;
-            Proc = Win32Process.Open(Id, ProcessRights.AllAccess);
+            Proc = Win32Process.GetCurrentProcess();
+            Id = Proc.Id;
             OutStream.Seek(0, SeekOrigin.Begin);
             OutStream.SetLength(0);
         }
@@ -54,8 +54,9 @@ namespace Edo
         [TestMethod]
         public void TestGetHandles()
         {
-            var handles = Win32Process.GetHandles(Id, ProcessRights.AllAccess);
-            Assert.AreEqual(10, handles.Count);
+            var handles = Win32Process.GetHandles();
+            var minimumHandles = handles.Where(handle => handle.HasRights(ProcessRights.AllAccess)).ToList();
+            var targetsThisProcess = minimumHandles.Where(handle => handle.TargetsProcess(Proc.Id)).ToList();
         }
 
         [TestMethod]
@@ -592,6 +593,20 @@ namespace Edo
         {
             IntPtr address = Proc.Alloc(1024);
             Proc.Free(address);
+        }
+
+        [TestMethod]
+        public void TestDuplicateHandle()
+        {
+            var duplicated = Proc.DuplicateHandle(Proc.Handle.DangerousGetHandle(), false);
+            Assert.AreNotEqual(Proc.Handle.DangerousGetHandle(), duplicated.DangerousGetHandle());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Win32Exception))]
+        public void TestDuplicateHandleThrowsOnApiError()
+        {
+            Proc.DuplicateHandle(IntPtr.Zero, false);
         }
 
         public Int32 Id { get; set; } 

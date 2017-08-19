@@ -9,6 +9,17 @@ namespace Edo
     public static class IntPtrExtension
     {
         /// <summary>
+        /// Returns an IntPtr representing a handle to INVALID_HANDLE_VALUE
+        /// </summary>
+        public static IntPtr Invalid
+        {
+            get
+            {
+                return new IntPtr(Constant.InvalidHandleValue);
+            }
+        }
+
+        /// <summary>
         /// Returns whether this IntPtr is a null pointer
         /// </summary>
         /// <param name="ptr">The pointer to be checked</param>
@@ -25,7 +36,7 @@ namespace Edo
         /// <returns></returns>
         public static Boolean IsInvalidHandle(this IntPtr ptr)
         {
-            return ptr.ToInt32() == Constant.InvalidHandleValue;
+            return ptr == Invalid;
         }
     }
 }
