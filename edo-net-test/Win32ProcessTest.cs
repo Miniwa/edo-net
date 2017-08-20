@@ -55,7 +55,7 @@ namespace Edo
         public void TestGetHandles()
         {
             var handles = Win32Process.GetHandles();
-            var minimumHandles = handles.Where(handle => handle.HasRights(ProcessRights.AllAccess)).ToList();
+            var minimumHandles = handles.Where(handle => handle.Type == HandleType.Process && handle.HasRights(ProcessRights.AllAccess)).ToList();
             var targetsThisProcess = minimumHandles.Where(handle => handle.TargetsProcess(Proc.Id)).ToList();
         }
 

@@ -4,10 +4,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
-using Edo.Win32.Model;
 using Microsoft.Win32.SafeHandles;
 
 namespace Edo.Win32
@@ -26,7 +24,7 @@ namespace Edo.Win32
         /// <exception cref="Win32Exception">On Windows API error</exception>
         public static SafeProcessHandle OpenHandle(Int32 id, ProcessRights desiredRights)
         {
-            IntPtr handle = Api.OpenProcess(desiredRights, false, Convert.ToUInt32(id));
+            IntPtr handle = Kernel32.OpenProcess(desiredRights, false, Convert.ToUInt32(id));
             if (handle.IsNullPtr())
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not open handle to process");
 
@@ -68,7 +66,7 @@ namespace Edo.Win32
             do
             {
                 buffer = new byte[size];
-                status = Api.NtQuerySystemInformation(SystemInformationType.HandleInformation, buffer,
+                status = NtDll.NtQuerySystemInformation(SystemInformationType.HandleInformation, buffer,
                     Convert.ToUInt32(size), ref actualSize);
                 if(status != NtStatus.Success && status != NtStatus.BufferTooSmall && status != NtStatus.InfoLengthMismatch)
                     throw new Win32Exception("Could not retrieve system handle information");
@@ -78,10 +76,10 @@ namespace Edo.Win32
             while (status != NtStatus.Success);
 
             int count = Seriz.Parse<int>(buffer);
-            SystemHandle32[] systemHandles = Seriz.Parse<SystemHandle32>(buffer.Skip(4).ToArray(), count);
+            NtDll.SystemHandle[] systemHandles = Seriz.Parse<NtDll.SystemHandle>(buffer.Skip(4).ToArray(), count);
             List<SystemHandle> results = new List<SystemHandle>();
             foreach (var handle in systemHandles)
-                results.Add(new SystemHandle(Convert.ToInt32(handle.ProcessId),
+                results.Add(new SystemHandle(Convert.ToInt32(handle.ProcessId), handle.Type,
                     new IntPtr(handle.Handle), handle.Rights));
 
             return results;
@@ -120,7 +118,7 @@ namespace Edo.Win32
 
             UIntPtr nrBytesRead;
             UInt32 unsignedCount = Convert.ToUInt32(count);
-            if (!Api.ReadProcessMemory(Handle.DangerousGetHandle(), address, buffer,
+            if (!Kernel32.ReadProcessMemory(Handle.DangerousGetHandle(), address, buffer,
                 new UIntPtr(unsignedCount), out nrBytesRead))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform read operation");
 
@@ -213,7 +211,7 @@ namespace Edo.Win32
 
             UInt32 unsignedCount = Convert.ToUInt32(count);
             UIntPtr nrBytesWritten;
-            if(!Api.WriteProcessMemory(Handle.DangerousGetHandle(), address, buffer,
+            if(!Kernel32.WriteProcessMemory(Handle.DangerousGetHandle(), address, buffer,
                 new UIntPtr(unsignedCount), out nrBytesWritten))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform write operation");
 
@@ -300,7 +298,7 @@ namespace Edo.Win32
             if(count <= 0)
                 throw new ArgumentException("Count must be greater than zero");
 
-            IntPtr address = Api.VirtualAllocEx(Handle.DangerousGetHandle(), IntPtr.Zero,
+            IntPtr address = Kernel32.VirtualAllocEx(Handle.DangerousGetHandle(), IntPtr.Zero,
                 new UIntPtr(Convert.ToUInt32(count)), allocationType, protectionOptions);
             if(address.IsNullPtr())
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not allocate memory within process");
@@ -328,7 +326,7 @@ namespace Edo.Win32
         /// <param name="address">The starting address of the block to be freed</param>
         public void Free(IntPtr address)
         {
-            if(!Api.VirtualFreeEx(Handle.DangerousGetHandle(), address, UIntPtr.Zero, FreeOptions.Release))
+            if(!Kernel32.VirtualFreeEx(Handle.DangerousGetHandle(), address, UIntPtr.Zero, FreeOptions.Release))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not free memory in process");
         }
 
@@ -345,7 +343,7 @@ namespace Edo.Win32
             Boolean inherit, DuplicationOptions duplicationOptions)
         {
             IntPtr targetHandle = IntPtr.Zero;
-            if (!Api.DuplicateHandle(Handle.DangerousGetHandle(), sourceHandle, IntPtrExtension.Invalid,
+            if (!Kernel32.DuplicateHandle(Handle.DangerousGetHandle(), sourceHandle, IntPtrExtension.Invalid,
                 ref targetHandle, desiredRights, inherit, duplicationOptions))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not duplicate handle");
 
@@ -374,7 +372,7 @@ namespace Edo.Win32
         /// </summary>
         public Int32 Id
         {
-            get { return Convert.ToInt32(Api.GetProcessId(Handle.DangerousGetHandle())); }
+            get { return Convert.ToInt32(Kernel32.GetProcessId(Handle.DangerousGetHandle())); }
         }
 
         /// <summary>
@@ -386,7 +384,7 @@ namespace Edo.Win32
             {
                 uint capacity = 1024;
                 StringBuilder builder = new StringBuilder(Convert.ToInt32(capacity));
-                if(!Api.QueryFullProcessImageName(Handle.DangerousGetHandle(), 0, builder, ref capacity))
+                if(!Kernel32.QueryFullProcessImageName(Handle.DangerousGetHandle(), 0, builder, ref capacity))
                     throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not retrieve process filename");
 
                 return builder.ToString(0, Convert.ToInt32(capacity));
@@ -408,15 +406,15 @@ namespace Edo.Win32
         {
             get
             {
-                IntPtr snapshot = Api.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, Convert.ToUInt32(Id));
+                IntPtr snapshot = Kernel32.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, Convert.ToUInt32(Id));
                 if(snapshot.IsInvalidHandle())
                     throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create module snapshot");
 
                 try
                 {
-                    ModuleEntry32 moduleEntry = new ModuleEntry32();
-                    moduleEntry.StructSize = Convert.ToUInt32(Marshal.SizeOf<ModuleEntry32>());
-                    if (!Api.Module32First(snapshot, ref moduleEntry))
+                    Kernel32.ModuleEntry32 moduleEntry = new Kernel32.ModuleEntry32();
+                    moduleEntry.StructSize = Convert.ToUInt32(Marshal.SizeOf<Kernel32.ModuleEntry32>());
+                    if (!Kernel32.Module32First(snapshot, ref moduleEntry))
                         throw new Win32Exception(Marshal.GetLastWin32Error(),
                             "Could not load the first module from the snapshot");
 
@@ -430,7 +428,7 @@ namespace Edo.Win32
 
                         modules.Add(module);
                     }
-                    while (Api.Module32Next(snapshot, ref moduleEntry));
+                    while (Kernel32.Module32Next(snapshot, ref moduleEntry));
 
                     int code = Marshal.GetLastWin32Error();
                     if(code != (int)ErrorCode.NoMoreFiles)
@@ -440,7 +438,7 @@ namespace Edo.Win32
                 }
                 finally
                 {
-                    if(!Api.CloseHandle(snapshot))
+                    if(!Kernel32.CloseHandle(snapshot))
                         throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not close snapshot handle");
                 }
             }

@@ -15,9 +15,10 @@ namespace Edo.Win32
         /// <param name="processId">The id of the process that owns the handle</param>
         /// <param name="handle">The handle represented as an IntPtr</param>
         /// <param name="rights">The rights held by this handle in the context of its target process</param>
-        public SystemHandle(Int32 processId, IntPtr handle, ProcessRights rights)
+        public SystemHandle(Int32 processId, HandleType type, IntPtr handle, ProcessRights rights)
         {
             ProcessId = processId;
+            Type = type;
             Handle = handle;
             Rights = rights;
         }
@@ -50,7 +51,7 @@ namespace Edo.Win32
                 SafeProcessHandle targetHandle = process.DuplicateHandle(Handle, ProcessRights.QueryInformation,
                     false, DuplicationOptions.None);
 
-                return Convert.ToInt32(Api.GetProcessId(targetHandle.DangerousGetHandle())) == targetId;
+                return Convert.ToInt32(Kernel32.GetProcessId(targetHandle.DangerousGetHandle())) == targetId;
             }
             catch (Win32Exception)
             {
@@ -72,6 +73,11 @@ namespace Edo.Win32
         /// The id of the process that owns this handle
         /// </summary>
         public Int32 ProcessId { get; private set; }
+
+        /// <summary>
+        /// The type of this handle
+        /// </summary>
+        public HandleType Type { get; private set; }
 
         /// <summary>
         /// A handle to a process represented as an IntPtr

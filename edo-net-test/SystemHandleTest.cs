@@ -11,9 +11,9 @@ namespace Edo
         public SystemHandleTest()
         {
             Current = Win32Process.GetCurrentProcess();
-            LocalHandle = new SystemHandle(Current.Id, Current.Handle.DangerousGetHandle(),
+            LocalHandle = new SystemHandle(Current.Id, HandleType.None, Current.Handle.DangerousGetHandle(),
                 ProcessRights.QueryInformation);
-            InvalidHandle = new SystemHandle(0, IntPtr.Zero, ProcessRights.None);
+            InvalidHandle = new SystemHandle(0, HandleType.None,  IntPtr.Zero, ProcessRights.None);
         }
 
         [TestInitialize]

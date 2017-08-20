@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
-using Edo.Win32.Model;
 
 namespace Edo.Win32
 {
     /// <summary>
-    /// Wraps functions imported from the windows api
+    /// Wraps functions and structures imported from kernel32.dll of the windows api
     /// </summary>
-    public static class Api
+    public static class Kernel32
     {
-        // Kernel32
+        #region Functions
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr OpenProcess([In] ProcessRights desiredRights, [In] Boolean inheritHandle, [In] UInt32 processId);
 
@@ -54,10 +52,28 @@ namespace Edo.Win32
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean Module32Next([In] IntPtr snapshot, ref ModuleEntry32 moduleEntry);
+        #endregion
 
-        //Ntdll
-        [DllImport("ntdll.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern NtStatus NtQuerySystemInformation([In] SystemInformationType infoType, byte[] buffer,
-            [In] UInt32 size, ref UInt32 actualSize);
+        /// <summary>
+        /// Represents the windows api structure MODULEENTRY32
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct ModuleEntry32
+        {
+            public UInt32 StructSize;
+            public UInt32 ModuleId;
+            public UInt32 ProcessId;
+            public UInt32 LoadCount1;
+            public UInt32 LoadCount2;
+            public IntPtr BaseAddress;
+            public UInt32 BaseSize;
+            public IntPtr Handle;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constant.MaxModuleName32 + 1)]
+            public String FileName;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constant.MaxPath)]
+            public String FullPath;
+        }
     }
 }
