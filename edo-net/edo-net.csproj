@@ -42,11 +42,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntPtrExtension.cs" />
+    <Compile Include="Win32\AdvApi32.cs" />
     <Compile Include="Win32\AllocationOptions.cs" />
     <Compile Include="Win32\DuplicationOptions.cs" />
     <Compile Include="Win32\FreeOptions.cs" />
     <Compile Include="Win32\HandleType.cs" />
     <Compile Include="Win32\NtDll.cs" />
+    <Compile Include="Win32\PrivilegeName.cs" />
+    <Compile Include="Win32\PrivilegeState.cs" />
     <Compile Include="Win32\SystemHandle.cs" />
     <Compile Include="Win32\Module.cs" />
     <Compile Include="Win32\Constant.cs" />

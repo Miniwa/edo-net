@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 
@@ -331,9 +332,36 @@ namespace Edo.Win32
         }
 
         /// <summary>
-        /// Returns a duplicate of given handle owned by the process
+        /// Enables or disables the privilege with given key for this process
         /// </summary>
-        /// <param name="sourceHandle">The handle to be duplicated</param>
+        /// <param name="key">The privilege key</param>
+        /// <param name="enable">Whether to enable or disable the privilege</param>
+        public void SetPrivilege(String key, Boolean enable)
+        {
+            AdvApi32.Luid luid = new AdvApi32.Luid();
+            if(!AdvApi32.LookupPrivilegeValue(null, key, ref luid))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform lookup of privilege value");
+
+            IntPtr handle = IntPtr.Zero;
+            if(!AdvApi32.OpenProcessToken(Handle.DangerousGetHandle(), TokenAccessLevels.AdjustPrivileges, ref handle))
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not open process token");
+
+            using (SafeAccessTokenHandle tokenHandle = new SafeAccessTokenHandle(handle))
+            {
+                AdvApi32.TokenPrivileges privileges = new AdvApi32.TokenPrivileges();
+                privileges.PrivilegeCount = 1;
+                privileges.Luid = luid;
+                privileges.State = enable ? PrivilegeState.Enabled : PrivilegeState.Removed;
+
+                if(!AdvApi32.AdjustTokenPrivileges(tokenHandle.DangerousGetHandle(), false, ref privileges, 0, IntPtr.Zero, IntPtr.Zero))
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not adjust token privileges");
+            }
+        }
+
+        /// <summary>
+        /// Returns a duplicate of given process handle owned by the process
+        /// </summary>
+        /// <param name="sourceHandle">The process handle to be duplicated</param>
         /// <param name="desiredRights">The desired rights to the process associated with given handle</param>
         /// <param name="inherit">Whether the new handle is inheritable</param>
         /// <param name="duplicationOptions">The duplication options to use when duplicating</param>
@@ -351,9 +379,9 @@ namespace Edo.Win32
         }
 
         /// <summary>
-        /// Returns a duplicate of given handle owned by the process with equal access rights to the source handle
+        /// Returns a duplicate of given process handle owned by the process with equal access rights to the source handle
         /// </summary>
-        /// <param name="sourceHandle">The handle to be duplicated</param>
+        /// <param name="sourceHandle">The process handle to be duplicated</param>
         /// <param name="inherit">Whether the new handle is inheritable</param>
         /// <returns>The newly duplicated handle</returns>
         /// <exception cref="Win32Exception">On windows api error</exception>

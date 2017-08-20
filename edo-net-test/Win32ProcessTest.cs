@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Edo.Mock;
 using Edo.Win32;
@@ -607,6 +608,20 @@ namespace Edo
         public void TestDuplicateHandleThrowsOnApiError()
         {
             Proc.DuplicateHandle(IntPtr.Zero, false);
+        }
+
+        [TestMethod]
+        public void TestSetPrivilege()
+        {
+            Proc.SetPrivilege(PrivilegeName.Debug, true);
+            Proc.SetPrivilege(PrivilegeName.AuthenticateAsUser, true);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Win32Exception))]
+        public void TestSetPrivilegeThrowsOnApiError()
+        {
+            Proc.SetPrivilege("testjaskdajsd", true);
         }
 
         public Int32 Id { get; set; } 
