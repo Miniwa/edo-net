@@ -15,7 +15,7 @@ namespace Edo
         {
             get
             {
-                return new IntPtr(Constant.InvalidHandleValue);
+                return new IntPtr(Constants.InvalidHandleValue);
             }
         }
 

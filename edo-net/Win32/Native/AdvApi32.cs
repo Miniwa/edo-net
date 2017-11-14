@@ -9,18 +9,6 @@ namespace Edo.Win32.Native
     /// </summary>
     public static class AdvApi32
     {
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Boolean OpenProcessToken([In] IntPtr processHandle, [In] TokenAccessLevels accessLevels,
-            ref IntPtr destinationHandle);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Boolean LookupPrivilegeValue([In] String systemName, [In] String name, ref Luid luid);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Boolean AdjustTokenPrivileges([In] IntPtr tokenHandle, [In] Boolean disableAllPrivileges,
-            ref TokenPrivileges newState, [In] UInt32 length, IntPtr previousState,
-            IntPtr requiredLength);
-
         /// <summary>
         /// Represents the structure LUID from the windows api
         /// </summary>
@@ -40,5 +28,17 @@ namespace Edo.Win32.Native
             public Luid Luid;
             public PrivilegeState State;
         }
+
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Boolean OpenProcessToken([In] IntPtr processHandle, [In] TokenAccessLevels accessLevels,
+            ref IntPtr destinationHandle);
+
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Boolean LookupPrivilegeValue([In] String systemName, [In] String name, ref Luid luid);
+
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Boolean AdjustTokenPrivileges([In] IntPtr tokenHandle, [In] Boolean disableAllPrivileges,
+            ref TokenPrivileges newState, [In] UInt32 length, IntPtr previousState,
+            IntPtr requiredLength);
     }
 }

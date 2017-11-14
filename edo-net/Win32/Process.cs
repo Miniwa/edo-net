@@ -15,7 +15,7 @@ namespace Edo.Win32
     /// <summary>
     /// Provides a managed low level interface to a windows process
     /// </summary>
-    public class Win32Process
+    public class Process
     {
         /// <summary>
         /// Opens a handle with given access rights to a process with given process id
@@ -40,18 +40,18 @@ namespace Edo.Win32
         /// <param name="desiredRights">The desired access rights to the process</param>
         /// <returns>The newly opened process</returns>
         /// <exception cref="Win32Exception">On Windows API error</exception>
-        public static Win32Process Open(Int32 id, ProcessRights desiredRights)
+        public static Process Open(Int32 id, ProcessRights desiredRights)
         {
-            return new Win32Process(OpenHandle(id, desiredRights));
+            return new Process(OpenHandle(id, desiredRights));
         }
 
         /// <summary>
         /// Returns the current process opened as a Win32Process with full access rights
         /// </summary>
         /// <returns>The current process</returns>
-        public static Win32Process GetCurrentProcess()
+        public static Process GetCurrentProcess()
         {
-            var process = Process.GetCurrentProcess();
+            var process = System.Diagnostics.Process.GetCurrentProcess();
             return Open(process.Id, ProcessRights.AllAccess);
         }
 
@@ -91,7 +91,7 @@ namespace Edo.Win32
         /// Creates the process with given handle
         /// </summary>
         /// <param name="handle">A handle to the process to be targeted</param>
-        public Win32Process(SafeProcessHandle handle)
+        public Process(SafeProcessHandle handle)
         {
             Handle = handle;
             Buffer = new byte[16];

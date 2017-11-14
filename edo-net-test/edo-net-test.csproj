@@ -61,7 +61,7 @@
     <Compile Include="Mock\MockVector.cs" />
     <Compile Include="SerizTest.cs" />
     <Compile Include="SystemHandleTest.cs" />
-    <Compile Include="Win32ProcessTest.cs" />
+    <Compile Include="ProcessTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

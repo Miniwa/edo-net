@@ -5,7 +5,7 @@ namespace Edo.Win32.Native
     /// <summary>
     /// Contains constants used by the windows api
     /// </summary>
-    public static class Constant
+    public static class Constants
     {
         /// <summary>
         /// Represents INVALID_HANDLE_VALUE

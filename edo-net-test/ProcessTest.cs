@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,9 +11,9 @@ using Edo.Win32.Native;
 namespace Edo
 {
     [TestClass]
-    public class Win32ProcessTest
+    public class ProcessTest
     {
-        public Win32ProcessTest()
+        public ProcessTest()
         {
             Proc = null;
             OutStream = new MemoryStream(32);
@@ -25,7 +24,7 @@ namespace Edo
         [TestInitialize]
         public void Init()
         {
-            Proc = Win32Process.GetCurrentProcess();
+            Proc = Process.GetCurrentProcess();
             Id = Proc.Id;
             OutStream.Seek(0, SeekOrigin.Begin);
             OutStream.SetLength(0);
@@ -34,7 +33,7 @@ namespace Edo
         [TestMethod]
         public void TestOpenHandle()
         {
-            var handle = Win32Process.OpenHandle(Id, ProcessRights.AllAccess);
+            var handle = Win32.Process.OpenHandle(Id, ProcessRights.AllAccess);
             handle.Dispose();
         }
 
@@ -42,20 +41,20 @@ namespace Edo
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenHandleThrowsOnApiError()
         {
-            Win32Process.OpenHandle(0, ProcessRights.AllAccess);
+            Win32.Process.OpenHandle(0, ProcessRights.AllAccess);
         }
 
         [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenThrowsOnApiError()
         {
-            Win32Process.Open(0, ProcessRights.AllAccess);
+            Win32.Process.Open(0, ProcessRights.AllAccess);
         }
 
         [TestMethod]
         public void TestGetHandles()
         {
-            var handles = Win32Process.GetHandles();
+            var handles = Win32.Process.GetHandles();
             var minimumHandles = handles.Where(handle => handle.Type == HandleType.Process && handle.HasRights(ProcessRights.AllAccess)).ToList();
             var targetsThisProcess = minimumHandles.Where(handle => handle.TargetsProcess(Proc.Id)).ToList();
         }
@@ -63,25 +62,25 @@ namespace Edo
         [TestMethod]
         public void TestId()
         {
-            int id = Process.GetCurrentProcess().Id;
+            int id = System.Diagnostics.Process.GetCurrentProcess().Id;
             Assert.AreEqual(id, Proc.Id);
         }
 
         [TestMethod]
         public void TestFileName()
         {
-            string name = Process.GetCurrentProcess().ProcessName + ".exe";
+            string name = System.Diagnostics.Process.GetCurrentProcess().ProcessName + ".exe";
             Assert.AreEqual(name, Proc.FileName);
         }
 
         [TestMethod]
         public void TestModules()
         {
-            var modules = Process.GetCurrentProcess().Modules;
+            var modules = System.Diagnostics.Process.GetCurrentProcess().Modules;
             var results = Proc.Modules;
 
             Assert.AreEqual(modules.Count, results.Count);
-            foreach (ProcessModule module in modules)
+            foreach (System.Diagnostics.ProcessModule module in modules)
             {
                 var match = results.Single(mod => module.FileName == mod.FullPath);
                 Assert.AreEqual(module.ModuleName, match.FileName);
@@ -94,7 +93,7 @@ namespace Edo
         public void TestMainModule()
         {
             Module main = Proc.MainModule;
-            var actual = Process.GetCurrentProcess().MainModule;
+            var actual = System.Diagnostics.Process.GetCurrentProcess().MainModule;
 
             Assert.AreEqual(actual.BaseAddress, main.BaseAddress);
         }
@@ -625,7 +624,7 @@ namespace Edo
         }
 
         public Int32 Id { get; set; } 
-        public Win32Process Proc { get; set; }
+        public Process Proc { get; set; }
         public MemoryStream OutStream { get; set; }
         public BinaryReader Reader { get; set; }
         public BinaryWriter Writer { get; set; }

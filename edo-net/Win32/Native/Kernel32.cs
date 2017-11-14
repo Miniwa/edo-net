@@ -24,10 +24,10 @@ namespace Edo.Win32.Native
             public UInt32 BaseSize;
             public IntPtr Handle;
 
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constant.MaxModuleName32 + 1)]
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constants.MaxModuleName32 + 1)]
             public String FileName;
 
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constant.MaxPath)]
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constants.MaxPath)]
             public String FullPath;
         }
 

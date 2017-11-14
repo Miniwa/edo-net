@@ -11,7 +11,7 @@ namespace Edo
     {
         public SystemHandleTest()
         {
-            Current = Win32Process.GetCurrentProcess();
+            Current = Process.GetCurrentProcess();
             LocalHandle = new SystemHandle(Current.Id, HandleType.None, Current.Handle.DangerousGetHandle(),
                 ProcessRights.QueryInformation);
             InvalidHandle = new SystemHandle(0, HandleType.None,  IntPtr.Zero, ProcessRights.None);
@@ -57,7 +57,7 @@ namespace Edo
             Assert.IsFalse(LocalHandle.HasRights(ProcessRights.CreateThread));
         }
 
-        public Win32Process Current { get; set; }
+        public Process Current { get; set; }
         public SystemHandle LocalHandle { get; set; }
         public SystemHandle InvalidHandle { get; set; }
         public SystemHandle ForeignHandle { get; set; }

@@ -32,7 +32,7 @@ namespace Edo.Win32
         /// <returns>The duplicated handle</returns>
         public SafeProcessHandle Duplicate(Boolean inherit)
         {
-            Win32Process process = Win32Process.Open(ProcessId, ProcessRights.DuplicateHandle);
+            Process process = Process.Open(ProcessId, ProcessRights.DuplicateHandle);
             return process.DuplicateHandle(Handle, ProcessRights.None, inherit, DuplicationOptions.SameAccess);
         }
 
@@ -49,7 +49,7 @@ namespace Edo.Win32
 
             try
             {
-                Win32Process process = Win32Process.Open(ProcessId, ProcessRights.DuplicateHandle);
+                Process process = Process.Open(ProcessId, ProcessRights.DuplicateHandle);
                 SafeProcessHandle targetHandle = process.DuplicateHandle(Handle, ProcessRights.QueryInformation,
                     false, DuplicationOptions.None);
 
