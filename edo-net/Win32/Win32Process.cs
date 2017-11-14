@@ -12,7 +12,7 @@ using Microsoft.Win32.SafeHandles;
 namespace Edo.Win32
 {
     /// <summary>
-    /// Provides a managed low level interface to a process
+    /// Provides a managed low level interface to a windows process
     /// </summary>
     public class Win32Process
     {

@@ -5,7 +5,7 @@ using Microsoft.Win32.SafeHandles;
 namespace Edo.Win32
 {
     /// <summary>
-    /// Represents a single handle currently activate in the system
+    /// Represents a single handle currently active in the system
     /// </summary>
     public struct SystemHandle
     {
@@ -13,6 +13,7 @@ namespace Edo.Win32
         /// Initializes the system handle with given process id, handle and process rights
         /// </summary>
         /// <param name="processId">The id of the process that owns the handle</param>
+        /// <param name="type">The type of the handle</param>
         /// <param name="handle">The handle represented as an IntPtr</param>
         /// <param name="rights">The rights held by this handle in the context of its target process</param>
         public SystemHandle(Int32 processId, HandleType type, IntPtr handle, ProcessRights rights)

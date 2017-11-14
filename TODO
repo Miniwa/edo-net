@@ -1,4 +1,12 @@
+64bit proof application:
+    Win32Process needs to handle different pointer sizes (Create IBinarySerializer interface and make 32bit/64bit implementations)
+    Complete type check of all native imports to see they're handled properly
+    Split bytecode into 32 and 64 bit versions
+
+Win32Process should be able to start threads
+Win32Process should be able to suspend, resume, kill and start new processes
+SystemHandle should check if process handle in "TargetsProcess"
+SystemHandle should be able to duplicate any handle, not just process handles
+Make DuplicateHandle able to duplicate any handle, not just process handles (The api is a bit weird right now)
 Implement stream methods in Seriz module
-Rework Native namespace
-Create framework specific exception types
-More proper testing of array methods in Seriz and VirtualMemory
+Create framework specific exception types to catch Win32Exceptions with native error message

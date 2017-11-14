@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -9,9 +10,34 @@ namespace Edo.Win32
     /// </summary>
     public static class Kernel32
     {
+        /// <summary>
+        /// Represents the windows api structure MODULEENTRY32
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct ModuleEntry32
+        {
+            public UInt32 StructSize;
+            public UInt32 ModuleId;
+            public UInt32 ProcessId;
+            public UInt32 LoadCount1;
+            public UInt32 LoadCount2;
+            public IntPtr BaseAddress;
+            public UInt32 BaseSize;
+            public IntPtr Handle;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constant.MaxModuleName32 + 1)]
+            public String FileName;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constant.MaxPath)]
+            public String FullPath;
+        }
+
         #region Functions
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr OpenProcess([In] ProcessRights desiredRights, [In] Boolean inheritHandle, [In] UInt32 processId);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern IntPtr GetModuleHandle([In] String name);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean DuplicateHandle([In] IntPtr sourceProcessHandle, [In] IntPtr sourceHandle,
@@ -20,6 +46,9 @@ namespace Edo.Win32
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean CloseHandle([In] IntPtr handle);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+        public static extern IntPtr GetProcAddress([In] IntPtr module, [In] String procName);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean ReadProcessMemory([In] IntPtr processHandle, [In] IntPtr address, [Out] byte[] buffer,
@@ -53,27 +82,5 @@ namespace Edo.Win32
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean Module32Next([In] IntPtr snapshot, ref ModuleEntry32 moduleEntry);
         #endregion
-
-        /// <summary>
-        /// Represents the windows api structure MODULEENTRY32
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        public struct ModuleEntry32
-        {
-            public UInt32 StructSize;
-            public UInt32 ModuleId;
-            public UInt32 ProcessId;
-            public UInt32 LoadCount1;
-            public UInt32 LoadCount2;
-            public IntPtr BaseAddress;
-            public UInt32 BaseSize;
-            public IntPtr Handle;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constant.MaxModuleName32 + 1)]
-            public String FileName;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constant.MaxPath)]
-            public String FullPath;
-        }
     }
 }
