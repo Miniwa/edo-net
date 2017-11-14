@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
-using Edo.Win32;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Edo.Win32;
+using Edo.Win32.Native;
 
 namespace Edo
 {

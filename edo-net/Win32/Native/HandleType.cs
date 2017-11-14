@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Edo.Win32
+namespace Edo.Win32.Native
 {
     /// <summary>
     /// An enumeration of available handle types in the windows api

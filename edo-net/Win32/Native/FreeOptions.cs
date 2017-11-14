@@ -1,4 +1,4 @@
-﻿namespace Edo.Win32
+﻿namespace Edo.Win32.Native
 {
     /// <summary>
     /// An enumeration of options available when freeing memory in the win api

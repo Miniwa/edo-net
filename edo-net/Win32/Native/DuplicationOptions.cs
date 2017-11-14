@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Edo.Win32
+namespace Edo.Win32.Native
 {
     /// <summary>
     /// An enumeration of all available handle duplication options in the windows api

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Edo.Win32
+namespace Edo.Win32.Native
 {
     /// <summary>
     /// Contains constants used by the windows api

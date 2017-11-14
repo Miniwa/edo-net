@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.AccessControl;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Edo.Mock;
 using Edo.Win32;
+using Edo.Win32.Native;
 
 namespace Edo
 {

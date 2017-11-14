@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Edo.Win32
+namespace Edo.Win32.Native
 {
     /// <summary>
     /// Wraps functions and structures imported from ntdll.dll of the windows api

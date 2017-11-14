@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using Microsoft.Win32.SafeHandles;
+using Edo.Win32.Native;
 
 namespace Edo.Win32
 {

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 
-namespace Edo.Win32
+namespace Edo.Win32.Native
 {
     /// <summary>
     /// Wraps functions and structures imported from Advapi32.dll of the windows api

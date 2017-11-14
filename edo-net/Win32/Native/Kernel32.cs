@@ -1,9 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Edo.Win32
+namespace Edo.Win32.Native
 {
     /// <summary>
     /// Wraps functions and structures imported from kernel32.dll of the windows api
