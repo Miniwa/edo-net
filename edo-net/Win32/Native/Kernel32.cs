@@ -31,16 +31,16 @@ namespace Edo.Win32.Native
             public String FullPath;
         }
 
-        #region Functions
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern IntPtr OpenProcess([In] ProcessRights desiredRights, [In] Boolean inheritHandle, [In] UInt32 processId);
+        public static extern IntPtr OpenProcess([In] ProcessRights desiredRights, [In] Boolean inheritHandle,
+            [In] UInt32 processId);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr GetModuleHandle([In] String name);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean DuplicateHandle([In] IntPtr sourceProcessHandle, [In] IntPtr sourceHandle,
-            [In] IntPtr targetProcessHandle, ref IntPtr targetHandle, [In] ProcessRights desiredProcessRights,
+            [In] IntPtr targetProcessHandle, ref IntPtr targetHandle, [In] UInt32 desiredRights,
             [In] Boolean inherit, [In] DuplicationOptions duplicationOptions);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -50,14 +50,15 @@ namespace Edo.Win32.Native
         public static extern IntPtr GetProcAddress([In] IntPtr module, [In] String procName);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Boolean ReadProcessMemory([In] IntPtr processHandle, [In] IntPtr address, [Out] byte[] buffer,
+        public static extern Boolean ReadProcessMemory([In] IntPtr processHandle, [In] IntPtr address,
+            [Out] byte[] buffer,
             [In] UIntPtr nrBytesToRead, [Out] out UIntPtr nrBytesRead);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Boolean WriteProcessMemory([In] IntPtr processHandle, [In] IntPtr address, [Out] byte[] buffer,
-            [In] UIntPtr nrBytesToWrite, [Out] out UIntPtr nrBytesWritten);
+        public static extern Boolean WriteProcessMemory([In] IntPtr processHandle, [In] IntPtr address,
+            [Out] byte[] buffer, [In] UIntPtr nrBytesToWrite, [Out] out UIntPtr nrBytesWritten);
 
-       [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr VirtualAllocEx([In] IntPtr processHandle, [In] IntPtr address, [In] UIntPtr size,
             [In] AllocationOptions allocationType, [In] ProtectionOptions protectionOptions);
 
@@ -80,6 +81,5 @@ namespace Edo.Win32.Native
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern Boolean Module32Next([In] IntPtr snapshot, ref ModuleEntry32 moduleEntry);
-        #endregion
     }
 }

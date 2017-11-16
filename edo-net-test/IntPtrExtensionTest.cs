@@ -12,7 +12,6 @@ namespace Edo
         {
             Ptr = new IntPtr(8000);
             NullPtr = new IntPtr(0);
-            InvalidPtr = new IntPtr(Constants.InvalidHandleValue);
         }
 
         [TestMethod]
@@ -25,18 +24,6 @@ namespace Edo
         public void TestIsNullPtrReturnsTrueIfNull()
         {
             Assert.IsTrue(NullPtr.IsNullPtr());
-        }
-
-        [TestMethod]
-        public void TestIsInvalidHandleReturnsFalseIfNotInvalid()
-        {
-            Assert.IsFalse(Ptr.IsInvalidHandle());
-        }
-
-        [TestMethod]
-        public void TestIsInvalidHandleReturnsTrueIfInvalid()
-        {
-            Assert.IsTrue(InvalidPtr.IsInvalidHandle());
         }
 
         public IntPtr Ptr { get; set; }

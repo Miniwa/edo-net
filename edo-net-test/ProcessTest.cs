@@ -31,32 +31,10 @@ namespace Edo
         }
 
         [TestMethod]
-        public void TestOpenHandle()
-        {
-            var handle = Win32.Process.OpenHandle(Id, ProcessRights.AllAccess);
-            handle.Dispose();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(Win32Exception))]
-        public void TestOpenHandleThrowsOnApiError()
-        {
-            Win32.Process.OpenHandle(0, ProcessRights.AllAccess);
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
         public void TestOpenThrowsOnApiError()
         {
             Win32.Process.Open(0, ProcessRights.AllAccess);
-        }
-
-        [TestMethod]
-        public void TestGetHandles()
-        {
-            var handles = Win32.Process.GetHandles();
-            var minimumHandles = handles.Where(handle => handle.Type == HandleType.Process && handle.HasRights(ProcessRights.AllAccess)).ToList();
-            var targetsThisProcess = minimumHandles.Where(handle => handle.TargetsProcess(Proc.Id)).ToList();
         }
 
         [TestMethod]
@@ -593,20 +571,6 @@ namespace Edo
         {
             IntPtr address = Proc.Alloc(1024);
             Proc.Free(address);
-        }
-
-        [TestMethod]
-        public void TestDuplicateHandle()
-        {
-            var duplicated = Proc.DuplicateHandle(Proc.Handle.DangerousGetHandle(), false);
-            Assert.AreNotEqual(Proc.Handle.DangerousGetHandle(), duplicated.DangerousGetHandle());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(Win32Exception))]
-        public void TestDuplicateHandleThrowsOnApiError()
-        {
-            Proc.DuplicateHandle(IntPtr.Zero, false);
         }
 
         [TestMethod]

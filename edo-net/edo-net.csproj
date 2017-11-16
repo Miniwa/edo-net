@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntPtrExtension.cs" />
+    <Compile Include="Win32\Handle.cs" />
     <Compile Include="Win32\Native\AdvApi32.cs" />
     <Compile Include="Win32\Native\AllocationOptions.cs" />
     <Compile Include="Win32\Native\DuplicationOptions.cs" />
@@ -50,7 +51,7 @@
     <Compile Include="Win32\Native\NtDll.cs" />
     <Compile Include="Win32\Native\PrivilegeName.cs" />
     <Compile Include="Win32\Native\PrivilegeState.cs" />
-    <Compile Include="Win32\SystemHandle.cs" />
+    <Compile Include="Win32\HandleInfo.cs" />
     <Compile Include="Win32\Module.cs" />
     <Compile Include="Win32\Native\Constants.cs" />
     <Compile Include="Win32\Native\ErrorCode.cs" />

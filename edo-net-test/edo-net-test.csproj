@@ -56,11 +56,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="HandleTest.cs" />
     <Compile Include="IntPtrExtensionTest.cs" />
     <Compile Include="Mock\MockClass.cs" />
     <Compile Include="Mock\MockVector.cs" />
     <Compile Include="SerizTest.cs" />
-    <Compile Include="SystemHandleTest.cs" />
+    <Compile Include="HandleInfoTest.cs" />
     <Compile Include="ProcessTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

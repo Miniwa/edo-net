@@ -6,7 +6,7 @@ namespace Edo.Win32
     /// <summary>
     /// Provides information about a single module within a process
     /// </summary>
-    public class Module
+    public class ModuleInfo
     {
         /// <summary>
         /// The base address of the module in virtual memory
@@ -21,10 +21,7 @@ namespace Edo.Win32
         /// <summary>
         /// The name of the module file
         /// </summary>
-        public String FileName
-        {
-            get { return Path.GetFileName(FullPath); }
-        }
+        public String FileName => Path.GetFileName(FullPath);
 
         /// <summary>
         /// The base size of the module in virtual memory

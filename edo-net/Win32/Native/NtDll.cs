@@ -19,7 +19,7 @@ namespace Edo.Win32.Native
             public Byte Flags;
             public UInt16 Handle;
             public IntPtr Address;
-            public ProcessRights Rights;
+            public UInt32 AccessMask;
         }
 
         [DllImport("ntdll.dll", SetLastError = true, CharSet = CharSet.Unicode)]

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -18,22 +17,6 @@ namespace Edo.Win32
     public class Process
     {
         /// <summary>
-        /// Opens a handle with given access rights to a process with given process id
-        /// </summary>
-        /// <param name="id">The id of the process to be opened</param>
-        /// <param name="desiredRights">The desired access rights to the process</param>
-        /// <returns>The new handle to the process</returns>
-        /// <exception cref="Win32Exception">On Windows API error</exception>
-        public static SafeProcessHandle OpenHandle(Int32 id, ProcessRights desiredRights)
-        {
-            IntPtr handle = Kernel32.OpenProcess(desiredRights, false, Convert.ToUInt32(id));
-            if (handle.IsNullPtr())
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not open handle to process");
-
-            return new SafeProcessHandle(handle, true);
-        }
-
-        /// <summary>
         /// Opens a process with given process id
         /// </summary>
         /// <param name="id">The id of the process to be opened</param>
@@ -42,7 +25,7 @@ namespace Edo.Win32
         /// <exception cref="Win32Exception">On Windows API error</exception>
         public static Process Open(Int32 id, ProcessRights desiredRights)
         {
-            return new Process(OpenHandle(id, desiredRights));
+            return new Process(Win32.Handle.OpenProcess(id, desiredRights));
         }
 
         /// <summary>
@@ -53,38 +36,6 @@ namespace Edo.Win32
         {
             var process = System.Diagnostics.Process.GetCurrentProcess();
             return Open(process.Id, ProcessRights.AllAccess);
-        }
-
-        /// <summary>
-        /// Returns a collection of handles that are currently active within the system
-        /// </summary>
-        /// <returns>A collection of active handles</returns>
-        public static ICollection<SystemHandle> GetHandles()
-        {
-            byte[] buffer;
-            NtStatus status;
-            int size = 1024;
-            uint actualSize = 0;
-            do
-            {
-                buffer = new byte[size];
-                status = NtDll.NtQuerySystemInformation(SystemInformationType.HandleInformation, buffer,
-                    Convert.ToUInt32(size), ref actualSize);
-                if(status != NtStatus.Success && status != NtStatus.BufferTooSmall && status != NtStatus.InfoLengthMismatch)
-                    throw new Win32Exception("Could not retrieve system handle information");
-
-                size = Convert.ToInt32(actualSize);
-            }
-            while (status != NtStatus.Success);
-
-            int count = Seriz.Parse<int>(buffer);
-            NtDll.SystemHandle[] systemHandles = Seriz.Parse<NtDll.SystemHandle>(buffer.Skip(4).ToArray(), count);
-            List<SystemHandle> results = new List<SystemHandle>();
-            foreach (var handle in systemHandles)
-                results.Add(new SystemHandle(Convert.ToInt32(handle.ProcessId), handle.Type,
-                    new IntPtr(handle.Handle), handle.Rights));
-
-            return results;
         }
 
         /// <summary>
@@ -360,38 +311,6 @@ namespace Edo.Win32
         }
 
         /// <summary>
-        /// Returns a duplicate of given process handle owned by the process
-        /// </summary>
-        /// <param name="sourceHandle">The process handle to be duplicated</param>
-        /// <param name="desiredRights">The desired rights to the process associated with given handle</param>
-        /// <param name="inherit">Whether the new handle is inheritable</param>
-        /// <param name="duplicationOptions">The duplication options to use when duplicating</param>
-        /// <returns>The newly duplicated handle</returns>
-        /// <exception cref="Win32Exception">On windows api error</exception>
-        public SafeProcessHandle DuplicateHandle(IntPtr sourceHandle, ProcessRights desiredRights,
-            Boolean inherit, DuplicationOptions duplicationOptions)
-        {
-            IntPtr targetHandle = IntPtr.Zero;
-            if (!Kernel32.DuplicateHandle(Handle.DangerousGetHandle(), sourceHandle, IntPtrExtension.Invalid,
-                ref targetHandle, desiredRights, inherit, duplicationOptions))
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not duplicate handle");
-
-            return new SafeProcessHandle(targetHandle, true);
-        }
-
-        /// <summary>
-        /// Returns a duplicate of given process handle owned by the process with equal access rights to the source handle
-        /// </summary>
-        /// <param name="sourceHandle">The process handle to be duplicated</param>
-        /// <param name="inherit">Whether the new handle is inheritable</param>
-        /// <returns>The newly duplicated handle</returns>
-        /// <exception cref="Win32Exception">On windows api error</exception>
-        public SafeProcessHandle DuplicateHandle(IntPtr sourceHandle, Boolean inherit)
-        {
-            return DuplicateHandle(sourceHandle, ProcessRights.None, inherit, DuplicationOptions.SameAccess);
-        }
-
-        /// <summary>
         /// The active handle to the process
         /// </summary>
         public SafeProcessHandle Handle { get; private set; }
@@ -436,7 +355,7 @@ namespace Edo.Win32
             get
             {
                 IntPtr snapshot = Kernel32.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, Convert.ToUInt32(Id));
-                if(snapshot.IsInvalidHandle())
+                if(snapshot == Win32.Handle.Invalid)
                     throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create module snapshot");
 
                 try

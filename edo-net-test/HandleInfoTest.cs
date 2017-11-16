@@ -7,34 +7,20 @@ using Edo.Win32.Native;
 namespace Edo
 {
     [TestClass]
-    public class SystemHandleTest
+    public class HandleInfoTest
     {
-        public SystemHandleTest()
+        public HandleInfoTest()
         {
             Current = Process.GetCurrentProcess();
-            LocalHandle = new SystemHandle(Current.Id, HandleType.None, Current.Handle.DangerousGetHandle(),
-                ProcessRights.QueryInformation);
-            InvalidHandle = new SystemHandle(0, HandleType.None,  IntPtr.Zero, ProcessRights.None);
+            LocalHandle = new HandleInfo(Current.Id, HandleType.Process, Current.Handle.DangerousGetHandle(),
+                (uint)ProcessRights.QueryInformation);
+            InvalidHandle = new HandleInfo(0, HandleType.None,  IntPtr.Zero, (uint)ProcessRights.None);
         }
 
         [TestInitialize]
         public void Initialize()
         {
             
-        }
-
-        [TestMethod]
-        public void TestDuplicate()
-        {
-            var duplicated = LocalHandle.Duplicate(false);
-            Assert.AreNotEqual(LocalHandle.Handle, duplicated.DangerousGetHandle());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(Win32Exception))]
-        public void TestDuplicateThrowsOnApiError()
-        {
-            InvalidHandle.Duplicate(false);
         }
 
         [TestMethod]
@@ -57,9 +43,15 @@ namespace Edo
             Assert.IsFalse(LocalHandle.HasRights(ProcessRights.CreateThread));
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void TestHasRightsThrowsIfNotProcessHandle()
+        {
+            InvalidHandle.HasRights(ProcessRights.CreateThread);
+        }
+
         public Process Current { get; set; }
-        public SystemHandle LocalHandle { get; set; }
-        public SystemHandle InvalidHandle { get; set; }
-        public SystemHandle ForeignHandle { get; set; }
+        public HandleInfo LocalHandle { get; set; }
+        public HandleInfo InvalidHandle { get; set; }
     }
 }

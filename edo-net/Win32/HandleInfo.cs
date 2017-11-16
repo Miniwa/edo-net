@@ -6,34 +6,23 @@ using Edo.Win32.Native;
 namespace Edo.Win32
 {
     /// <summary>
-    /// Represents a single handle currently active in the system
+    /// Represents information about a handle that is currently active in the system
     /// </summary>
-    public struct SystemHandle
+    public struct HandleInfo
     {
         /// <summary>
-        /// Initializes the system handle with given process id, handle and process rights
+        /// Initializes the handle with given process id, handle and process rights
         /// </summary>
         /// <param name="processId">The id of the process that owns the handle</param>
         /// <param name="type">The type of the handle</param>
         /// <param name="handle">The handle represented as an IntPtr</param>
         /// <param name="rights">The rights held by this handle in the context of its target process</param>
-        public SystemHandle(Int32 processId, HandleType type, IntPtr handle, ProcessRights rights)
+        public HandleInfo(Int32 processId, HandleType type, IntPtr handle, UInt32 accessMask)
         {
             ProcessId = processId;
             Type = type;
             Handle = handle;
-            Rights = rights;
-        }
-
-        /// <summary>
-        /// Duplicates and returns a clone of this handle that holds equal access rights in the context of its target process
-        /// </summary>
-        /// <param name="inherit">Whether the handle should be inheritable</param>
-        /// <returns>The duplicated handle</returns>
-        public SafeProcessHandle Duplicate(Boolean inherit)
-        {
-            Process process = Process.Open(ProcessId, ProcessRights.DuplicateHandle);
-            return process.DuplicateHandle(Handle, ProcessRights.None, inherit, DuplicationOptions.SameAccess);
+            AccessMask = accessMask;
         }
 
         /// <summary>
@@ -49,11 +38,12 @@ namespace Edo.Win32
 
             try
             {
-                Process process = Process.Open(ProcessId, ProcessRights.DuplicateHandle);
-                SafeProcessHandle targetHandle = process.DuplicateHandle(Handle, ProcessRights.QueryInformation,
+                // TODO: Need to find a better way for this
+                Process owner = Process.Open(ProcessId, ProcessRights.DuplicateHandle);
+                SafeProcessHandle duplicate = Edo.Win32.Handle.DuplicateProcessHandle(owner.Handle, Handle, ProcessRights.QueryInformation,
                     false, DuplicationOptions.None);
 
-                return Convert.ToInt32(Kernel32.GetProcessId(targetHandle.DangerousGetHandle())) == targetId;
+                return Convert.ToInt32(Kernel32.GetProcessId(duplicate.DangerousGetHandle())) == targetId;
             }
             catch (Win32Exception)
             {
@@ -62,33 +52,56 @@ namespace Edo.Win32
         }
 
         /// <summary>
-        /// Returns whether this handle holds at least given access rights in the context of its target process
+        /// Returns whether this handle holds at least given standard rights
+        /// </summary>
+        /// <param name="rights">The minimum access rights required</param>
+        /// <returns>A boolean indicating whether this handle holds at minimum given access rights</returns>
+        public Boolean HasRights(UInt32 rights)
+        {
+            return (rights & AccessMask) == rights;
+        }
+
+        /// <summary>
+        /// Returns whether this handle holds at least given standard rights
+        /// </summary>
+        /// <param name="rights">The minimum access rights required</param>
+        /// <returns>A boolean indicating whether this handle holds at minimum given access rights</returns>
+        public Boolean HasRights(StandardRights rights)
+        {
+            return HasRights((uint)rights);
+        }
+
+        /// <summary>
+        /// Returns whether this handle holds at least given process rights
         /// </summary>
         /// <param name="rights">The minimum access rights required</param>
         /// <returns>A boolean indicating whether this handle holds at minimum given access rights</returns>
         public Boolean HasRights(ProcessRights rights)
         {
-            return (rights & Rights) == rights;
+            if(Type != HandleType.Process)
+                throw new InvalidOperationException("Can only check process rights on a process handle");
+
+            return HasRights((uint)rights);
         }
 
         /// <summary>
         /// The id of the process that owns this handle
         /// </summary>
-        public Int32 ProcessId { get; private set; }
+        public Int32 ProcessId { get; }
 
         /// <summary>
         /// The type of this handle
         /// </summary>
-        public HandleType Type { get; private set; }
+        public HandleType Type { get; }
 
         /// <summary>
-        /// A handle to a process represented as an IntPtr
+        /// A handle represented as an IntPtr
         /// </summary>
-        public IntPtr Handle { get; private set; }
+        public IntPtr Handle { get; }
 
         /// <summary>
         /// The access rights held by this handle in the context of its target process
         /// </summary>
-        public ProcessRights Rights { get; private set; }
+        public UInt32 AccessMask { get; }
     }
 }
