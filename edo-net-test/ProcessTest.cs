@@ -70,7 +70,7 @@ namespace Edo
         [TestMethod]
         public void TestMainModule()
         {
-            Module main = Proc.MainModule;
+            ModuleInfo main = Proc.MainModule;
             var actual = System.Diagnostics.Process.GetCurrentProcess().MainModule;
 
             Assert.AreEqual(actual.BaseAddress, main.BaseAddress);

@@ -52,7 +52,7 @@
     <Compile Include="Win32\Native\PrivilegeName.cs" />
     <Compile Include="Win32\Native\PrivilegeState.cs" />
     <Compile Include="Win32\HandleInfo.cs" />
-    <Compile Include="Win32\Module.cs" />
+    <Compile Include="Win32\ModuleInfo.cs" />
     <Compile Include="Win32\Native\Constants.cs" />
     <Compile Include="Win32\Native\ErrorCode.cs" />
     <Compile Include="Win32\Native\NtStatus.cs" />
@@ -62,9 +62,12 @@
     <Compile Include="Win32\Native\SnapshotFlags.cs" />
     <Compile Include="Win32\Native\StandardRights.cs" />
     <Compile Include="Win32\Native\SystemInformationType.cs" />
+    <Compile Include="Win32\Native\TlHelp32.cs" />
     <Compile Include="Win32\Process.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32\Native\Kernel32.cs" />
+    <Compile Include="Win32\Thread.cs" />
+    <Compile Include="Win32\ThreadInfo.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

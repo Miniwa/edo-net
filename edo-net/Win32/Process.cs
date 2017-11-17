@@ -66,17 +66,18 @@ namespace Edo.Win32
             if(count <= 0)
                 throw new ArgumentException("Count must be greater than zero");
 
-            if (count > buffer.Length)
+            if(count > buffer.Length)
                 throw new ArgumentException("Not enough room in buffer to hold requested amount of data");
 
             UIntPtr nrBytesRead;
             UInt32 unsignedCount = Convert.ToUInt32(count);
-            if (!Kernel32.ReadProcessMemory(Handle.DangerousGetHandle(), address, buffer,
+            if(!Kernel32.ReadProcessMemory(Handle.DangerousGetHandle(), address, buffer,
                 new UIntPtr(unsignedCount), out nrBytesRead))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform read operation");
 
-            if (nrBytesRead.ToUInt32() != unsignedCount)
-                throw new InvalidOperationException(string.Format("Operation only read {0} out of {1} wanted bytes", nrBytesRead, count));
+            if(nrBytesRead.ToUInt32() != unsignedCount)
+                throw new InvalidOperationException(string.Format("Operation only read {0} out of {1} wanted bytes",
+                    nrBytesRead, count));
         }
 
         /// <summary>
@@ -97,7 +98,7 @@ namespace Edo.Win32
             if(count <= 0)
                 throw new ArgumentException("Count must be greater than zero");
 
-            if (count > Buffer.Length)
+            if(count > Buffer.Length)
                 Buffer = new byte[count];
 
             Read(address, Buffer, count);
@@ -159,7 +160,7 @@ namespace Edo.Win32
             if(count <= 0)
                 throw new ArgumentException("Count must be greater than or equal to zero");
 
-            if (count > buffer.Length)
+            if(count > buffer.Length)
                 throw new ArgumentException("Not enough room in buffer to hold requested amount of data");
 
             UInt32 unsignedCount = Convert.ToUInt32(count);
@@ -169,7 +170,8 @@ namespace Edo.Win32
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not perform write operation");
 
             if(nrBytesWritten.ToUInt32() != unsignedCount)
-                throw new InvalidOperationException(string.Format("Operation only wrote {0} out of {1} wanted bytes", nrBytesWritten, count));
+                throw new InvalidOperationException(string.Format("Operation only wrote {0} out of {1} wanted bytes",
+                    nrBytesWritten, count));
         }
 
         /// <summary>
@@ -189,7 +191,7 @@ namespace Edo.Win32
             if(count <= 0)
                 throw new ArgumentException("Count must be greater then zero");
 
-            if (count > Buffer.Length)
+            if(count > Buffer.Length)
                 Buffer = new byte[count];
 
             stream.Read(Buffer, 0, count);
@@ -208,7 +210,7 @@ namespace Edo.Win32
         {
             if(value == null)
                 throw new ArgumentNullException(nameof(value));
-            
+
             Write(address, new T[] {value});
         }
 
@@ -267,7 +269,7 @@ namespace Edo.Win32
         /// <exception cref="ArgumentException">If count is equal to or less than zero</exception>
         public IntPtr Alloc(int count)
         {
-            if (count <= 0)
+            if(count <= 0)
                 throw new ArgumentException("Count must be greater than zero");
 
             return Alloc(count, AllocationOptions.Commit, ProtectionOptions.ExecuteReadWrite);
@@ -298,30 +300,84 @@ namespace Edo.Win32
             if(!AdvApi32.OpenProcessToken(Handle.DangerousGetHandle(), TokenAccessLevels.AdjustPrivileges, ref handle))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not open process token");
 
-            using (SafeAccessTokenHandle tokenHandle = new SafeAccessTokenHandle(handle))
+            using(SafeAccessTokenHandle tokenHandle = new SafeAccessTokenHandle(handle))
             {
                 AdvApi32.TokenPrivileges privileges = new AdvApi32.TokenPrivileges();
                 privileges.PrivilegeCount = 1;
                 privileges.Luid = luid;
                 privileges.State = enable ? PrivilegeState.Enabled : PrivilegeState.Removed;
 
-                if(!AdvApi32.AdjustTokenPrivileges(tokenHandle.DangerousGetHandle(), false, ref privileges, 0, IntPtr.Zero, IntPtr.Zero))
+                if(!AdvApi32.AdjustTokenPrivileges(tokenHandle.DangerousGetHandle(), false, ref privileges, 0,
+                    IntPtr.Zero, IntPtr.Zero))
                     throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not adjust token privileges");
             }
         }
 
         /// <summary>
-        /// The active handle to the process
+        /// The collection of threads that are owned by this process
         /// </summary>
-        public SafeProcessHandle Handle { get; private set; }
+        public ICollection<ThreadInfo> Threads
+        {
+            get
+            {
+                return Thread.GetThreads().Where(thread => thread.ProcessId == Id).ToList();
+            }
+        }
 
         /// <summary>
-        /// The id of the process
+        /// The collection of modules that are loaded into this process
         /// </summary>
-        public Int32 Id
+        public ICollection<ModuleInfo> Modules
         {
-            get { return Convert.ToInt32(Kernel32.GetProcessId(Handle.DangerousGetHandle())); }
+            get
+            {
+                IntPtr snapshot = Kernel32.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, Convert.ToUInt32(Id));
+                if(snapshot == Win32.Handle.Invalid)
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create module snapshot");
+
+                try
+                {
+                    TlHelp32.ModuleEntry32 moduleEntry = new TlHelp32.ModuleEntry32();
+                    moduleEntry.StructSize = Convert.ToUInt32(Marshal.SizeOf<TlHelp32.ModuleEntry32>());
+                    if(!Kernel32.Module32First(snapshot, ref moduleEntry))
+                        throw new Win32Exception(Marshal.GetLastWin32Error(),
+                            "Could not load the first module from the snapshot");
+
+                    List<ModuleInfo> modules = new List<ModuleInfo>();
+                    do
+                    {
+                        ModuleInfo module = new ModuleInfo(moduleEntry.BaseAddress,
+                            moduleEntry.FullPath, Convert.ToInt32(moduleEntry.BaseSize));
+
+                        modules.Add(module);
+                    }
+                    while(Kernel32.Module32Next(snapshot, ref moduleEntry));
+
+                    int code = Marshal.GetLastWin32Error();
+                    if(code != (int)ErrorCode.NoMoreFiles)
+                        throw new Win32Exception(code, "Could not load the next module from the snapshot");
+
+                    return modules;
+                }
+                finally
+                {
+                    Win32.Handle.Close(snapshot);
+                }
+            }
         }
+
+        /// <summary>
+        /// The main module of the process
+        /// </summary>
+        public ModuleInfo MainModule
+        {
+            get { return Modules.Single(module => module.FileName == FileName); }
+        }
+
+        /// <summary>
+        /// The unique identifier of the process
+        /// </summary>
+        public Int32 Id => Convert.ToInt32(Kernel32.GetProcessId(Handle.DangerousGetHandle()));
 
         /// <summary>
         /// The full path of the file used to start the process
@@ -342,63 +398,12 @@ namespace Edo.Win32
         /// <summary>
         /// The filename of the file used to start the process
         /// </summary>
-        public string FileName
-        {
-            get { return Path.GetFileName(FullPath); }
-        }
+        public string FileName => Path.GetFileName(FullPath);
 
         /// <summary>
-        /// The collection of modules that are loaded into this process
+        /// The active handle to the process
         /// </summary>
-        public ICollection<Module> Modules
-        {
-            get
-            {
-                IntPtr snapshot = Kernel32.CreateToolhelp32Snapshot(SnapshotFlags.Module | SnapshotFlags.NoHeaps, Convert.ToUInt32(Id));
-                if(snapshot == Win32.Handle.Invalid)
-                    throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create module snapshot");
-
-                try
-                {
-                    Kernel32.ModuleEntry32 moduleEntry = new Kernel32.ModuleEntry32();
-                    moduleEntry.StructSize = Convert.ToUInt32(Marshal.SizeOf<Kernel32.ModuleEntry32>());
-                    if (!Kernel32.Module32First(snapshot, ref moduleEntry))
-                        throw new Win32Exception(Marshal.GetLastWin32Error(),
-                            "Could not load the first module from the snapshot");
-
-                    List<Module> modules = new List<Module>();
-                    do
-                    {
-                        Module module = new Module();
-                        module.BaseAddress = moduleEntry.BaseAddress;
-                        module.BaseSize = Convert.ToInt32(moduleEntry.BaseSize);
-                        module.FullPath = moduleEntry.FullPath;
-
-                        modules.Add(module);
-                    }
-                    while (Kernel32.Module32Next(snapshot, ref moduleEntry));
-
-                    int code = Marshal.GetLastWin32Error();
-                    if(code != (int)ErrorCode.NoMoreFiles)
-                        throw new Win32Exception(code, "Could not load the next module from the snapshot");
-
-                    return modules;
-                }
-                finally
-                {
-                    if(!Kernel32.CloseHandle(snapshot))
-                        throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not close snapshot handle");
-                }
-            }
-        }
-
-        /// <summary>
-        /// The main module of the process
-        /// </summary>
-        public Module MainModule
-        {
-            get { return Modules.Single(module => module.FileName == FileName); }
-        }
+        public SafeProcessHandle Handle { get; }
 
         /// <summary>
         /// Internal buffer used in some operations

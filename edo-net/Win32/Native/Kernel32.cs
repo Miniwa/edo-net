@@ -9,28 +9,6 @@ namespace Edo.Win32.Native
     /// </summary>
     public static class Kernel32
     {
-        /// <summary>
-        /// Represents the windows api structure MODULEENTRY32
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        public struct ModuleEntry32
-        {
-            public UInt32 StructSize;
-            public UInt32 ModuleId;
-            public UInt32 ProcessId;
-            public UInt32 LoadCount1;
-            public UInt32 LoadCount2;
-            public IntPtr BaseAddress;
-            public UInt32 BaseSize;
-            public IntPtr Handle;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constants.MaxModuleName32 + 1)]
-            public String FileName;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Constants.MaxPath)]
-            public String FullPath;
-        }
-
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr OpenProcess([In] ProcessRights desiredRights, [In] Boolean inheritHandle,
             [In] UInt32 processId);
@@ -77,9 +55,15 @@ namespace Edo.Win32.Native
         public static extern IntPtr CreateToolhelp32Snapshot([In] SnapshotFlags flags, [In] UInt32 processId);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Boolean Module32First([In] IntPtr snapshot, ref ModuleEntry32 moduleEntry);
+        public static extern Boolean Thread32First([In] IntPtr snapshot, ref TlHelp32.ThreadEntry32 threadEntry);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Boolean Module32Next([In] IntPtr snapshot, ref ModuleEntry32 moduleEntry);
+        public static extern Boolean Thread32Next([In] IntPtr snapshot, ref TlHelp32.ThreadEntry32 threadEntry);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Boolean Module32First([In] IntPtr snapshot, ref TlHelp32.ModuleEntry32 moduleEntry);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Boolean Module32Next([In] IntPtr snapshot, ref TlHelp32.ModuleEntry32 moduleEntry);
     }
 }

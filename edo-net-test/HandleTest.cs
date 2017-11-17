@@ -43,7 +43,7 @@ namespace Edo
         }
 
         [TestMethod]
-        public void TestDuplicateHandle()
+        public void TestDuplicateProcessHandle()
         {
             var duplicated = Handle.DuplicateProcessHandle(Current.Handle, Current.Handle.DangerousGetHandle(),
                 ProcessRights.None, false, DuplicationOptions.SameAccess);
@@ -53,9 +53,9 @@ namespace Edo
 
         [TestMethod]
         [ExpectedException(typeof(Win32Exception))]
-        public void TestDuplicateHandleThrowsOnApiError()
+        public void TestDuplicateThrowsOnApiError()
         {
-            Handle.DuplicateHandle(Current.Handle, IntPtr.Zero, 0, false, DuplicationOptions.None, Current.Handle);
+            Handle.Duplicate(Current.Handle, IntPtr.Zero, 0, false, DuplicationOptions.None, Current.Handle);
         }
 
         [TestMethod]

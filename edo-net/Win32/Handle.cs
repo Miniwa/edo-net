@@ -81,7 +81,7 @@ namespace Edo.Win32
         /// <param name="destination">The process that should recieve the handle duplicate</param>
         /// <returns>The newly duplicated handle</returns>
         /// <exception cref="Win32Exception">On windows api error</exception>
-        public static IntPtr DuplicateHandle(SafeProcessHandle owner, IntPtr sourceHandle,
+        public static IntPtr Duplicate(SafeProcessHandle owner, IntPtr sourceHandle,
             UInt32 desiredRights, Boolean inherit, DuplicationOptions options, SafeProcessHandle destination)
         {
             IntPtr destinationHandle = IntPtr.Zero;
@@ -108,7 +108,7 @@ namespace Edo.Win32
         public static SafeProcessHandle DuplicateProcessHandle(SafeProcessHandle owner, IntPtr sourceHandle,
             ProcessRights desiredRights, Boolean inherit, DuplicationOptions options, SafeProcessHandle destination)
         {
-            IntPtr handle = DuplicateHandle(owner, sourceHandle,
+            IntPtr handle = Duplicate(owner, sourceHandle,
                 (UInt32)desiredRights, inherit, options, destination);
 
             return new SafeProcessHandle(handle, true);
@@ -130,6 +130,17 @@ namespace Edo.Win32
             var process = Process.GetCurrentProcess();
             return DuplicateProcessHandle(owner, sourceHandle, desiredRights,
                 inherit, options, process.Handle);
+        }
+
+        /// <summary>
+        /// Closes given handle
+        /// </summary>
+        /// <param name="handle">The handle to be closed</param>
+        /// <exception cref="Win32Exception">On windows api error</exception>
+        public static void Close(IntPtr handle)
+        {
+            if(!Kernel32.CloseHandle(handle))
+                throw new Win32Exception("Could not close handle");
         }
 
         /// <summary>

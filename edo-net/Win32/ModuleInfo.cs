@@ -8,6 +8,13 @@ namespace Edo.Win32
     /// </summary>
     public class ModuleInfo
     {
+        public ModuleInfo(IntPtr baseAdress, String fullPath, Int32 baseSize)
+        {
+            BaseAddress = baseAdress;
+            FullPath = fullPath;
+            BaseSize = baseSize;
+        }
+
         /// <summary>
         /// The base address of the module in virtual memory
         /// </summary>
